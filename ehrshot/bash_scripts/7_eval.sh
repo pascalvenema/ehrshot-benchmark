@@ -68,11 +68,11 @@ else
         # "chexpert" # CheXpert first b/c slowest
     )
     path_to_database="../../EHRSHOT_ASSETS/femr/extract"
-    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark_ehrshot"
+    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark"
     # path_to_features_dir="../../EHRSHOT_ASSETS/features_ehrshot"
-    path_to_features_dir="/share/pi/nigam/mwornow/ehrshot-benchmark/EHRSHOT_ASSETS/features_ehrshot"
-    path_to_output_dir='../../EHRSHOT_ASSETS/results_ehrshot'
-    path_to_split_csv="../../EHRSHOT_ASSETS/splits_ehrshot/person_id_map.csv"
+    path_to_features_dir="/share/pi/nigam/mwornow/ehrshot-benchmark/EHRSHOT_ASSETS/features"
+    path_to_output_dir='../../EHRSHOT_ASSETS/results'
+    path_to_split_csv="../../EHRSHOT_ASSETS/splits/person_id_map.csv"
     path_to_tokenized_timelines='/share/pi/nigam/mwornow/ehrshot-benchmark/EHRSHOT_ASSETS/tokenized_timelines_ehrshot'
 fi
 
