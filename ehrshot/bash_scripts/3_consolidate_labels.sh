@@ -19,7 +19,7 @@ if [[ " $* " == *" --mimic4 "* ]]; then
 elif [[ " $* " == *" --starr "* ]]; then
     path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark_starr"
 else
-    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark_ehrshot"
+    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark"
 fi
 
 python3 ../3_consolidate_labels.py \
