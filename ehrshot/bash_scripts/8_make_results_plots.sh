@@ -24,8 +24,8 @@ fi
 mkdir -p $path_to_figures_dir
 
 python3 ../8_make_results_plots.py \
-    --path_to_labels_and_feats_dir /share/pi/nigam/$USER/ehrshot-benchmark/ehrshot/bash_scripts/$path_to_labels_dir \
-    --path_to_results_dir /share/pi/nigam/$USER/ehrshot-benchmark/ehrshot/bash_scripts/$path_to_results_dir \
+    --path_to_labels_and_feats_dir $path_to_labels_dir \
+    --path_to_results_dir $path_to_results_dir \
     --path_to_output_dir $path_to_figures_dir \
     --shot_strat all \
     --model_heads "[('clmbr', 'lr_lbfgs'), \
