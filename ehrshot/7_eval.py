@@ -127,8 +127,16 @@ def run_evaluation(X_train: np.ndarray,
         X_train = scaler.fit_transform(X_train)
         X_val = scaler.transform(X_val)
         X_test = scaler.transform(X_test)
+        
+        # Adjust n_neighbors based on training set size
+        n_samples = X_train.shape[0]
+        adjusted_knn_params = KNN_PARAMS.copy()
+        adjusted_knn_params['n_neighbors'] = [k for k in KNN_PARAMS['n_neighbors'] if k <= n_samples]
+        if not adjusted_knn_params['n_neighbors']:
+            adjusted_knn_params['n_neighbors'] = [1]  # Fallback to k=1 if all k values are too large
+            
         model = KNeighborsClassifier()
-        model = tune_hyperparams(X_train, X_val, y_train, y_val, model, KNN_PARAMS, n_jobs=n_jobs)
+        model = tune_hyperparams(X_train, X_val, y_train, y_val, model, adjusted_knn_params, n_jobs=n_jobs)
         logger.info(f"Best hparams: {model.get_params()}")
     else:
         raise ValueError(f"Model head `{model_head}` not supported.")

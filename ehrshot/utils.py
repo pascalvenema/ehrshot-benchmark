@@ -170,9 +170,9 @@ RF_PARAMS = {
 
 # kNN hyperparameters
 KNN_PARAMS = {
-    'n_neighbors': [1, 3, 5, 7, 9, 11],
+    'n_neighbors': [1, 3, 5],
     'weights': ['uniform', 'distance'],
-    'metric': ['euclidean', 'manhattan', 'cosine']
+    'metric': ['euclidean', 'cosine']
 }
 
 # Few shot settings
