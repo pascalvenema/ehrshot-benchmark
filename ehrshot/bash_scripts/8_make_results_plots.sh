@@ -16,9 +16,9 @@ elif [[ " $* " == *" --starr "* ]]; then
     path_to_results_dir='../../EHRSHOT_ASSETS/starr_results'
     path_to_figures_dir="../../EHRSHOT_ASSETS/starr_figures"
 else
-    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark_ehrshot"
-    path_to_results_dir='../../EHRSHOT_ASSETS/results_ehrshot'
-    path_to_figures_dir="../../EHRSHOT_ASSETS/figures_ehrshot"
+    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark"
+    path_to_results_dir='../../EHRSHOT_ASSETS/results'
+    path_to_figures_dir="../../EHRSHOT_ASSETS/figures"
 fi
 
 mkdir -p $path_to_figures_dir
