@@ -64,8 +64,8 @@ else
         "chexpert"
     )
     path_to_database="../../EHRSHOT_ASSETS/femr/extract"
-    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark_ehrshot"
-    path_to_split_csv="../../EHRSHOT_ASSETS/splits_ehrshot/person_id_map.csv"
+    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark"
+    path_to_split_csv="../../EHRSHOT_ASSETS/splits/person_id_map.csv"
 fi
 
 shot_strats=("all")
