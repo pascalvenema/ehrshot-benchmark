@@ -12,7 +12,7 @@ if [[ " $* " == *" --mimic4 "* ]]; then
 elif [[ " $* " == *" --starr "* ]]; then
     path_to_results_dir='../../EHRSHOT_ASSETS/starr_results'
 else
-    path_to_results_dir='../../EHRSHOT_ASSETS/ehrshot_results'
+    path_to_results_dir='../../EHRSHOT_ASSETS/results'
 fi
 
 python3 ../10_cis.py \
