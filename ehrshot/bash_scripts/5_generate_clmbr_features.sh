@@ -26,8 +26,8 @@ elif [[ " $* " == *" --starr "* ]]; then
     path_to_features_dir="../../EHRSHOT_ASSETS/features_starr"
 else
     path_to_database="../../EHRSHOT_ASSETS/femr/extract"
-    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark_ehrshot"
-    path_to_features_dir="../../EHRSHOT_ASSETS/features_ehrshot"
+    path_to_labels_dir="../../EHRSHOT_ASSETS/benchmark"
+    path_to_features_dir="../../EHRSHOT_ASSETS/features"
 fi
 
 python3 ../5_generate_clmbr_features.py \
