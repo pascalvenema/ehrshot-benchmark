@@ -23,11 +23,11 @@ path_to_split_csv = '/share/pi/nigam/mwornow/ehrshot-benchmark-natasha/EHRSHOT_A
 MODEL_2_INFO: Dict[str, Dict[str, Any]] = {
     'count' : {
         'label' : 'Count-based (v8)',
-        'heads' : ['gbm', 'lr_lbfgs', 'rf', ],
+        'heads' : ['gbm', 'lr_lbfgs', 'rf'],
     },
     'clmbr' : {
         'label' : 'CLMBR (v8)',
-        'heads' : ['lr_lbfgs', ],
+        'heads' : ['lr_lbfgs', 'knn'],
     },
 }
 
@@ -47,6 +47,9 @@ HEAD_2_INFO: Dict[str, Dict[str, str]] = {
     },
     'rf' : {
         'label' : 'Random Forest',
+    },
+    'knn' : {
+        'label' : 'k-Nearest Neighbors',
     },
 }
 
@@ -163,6 +166,13 @@ LR_PARAMS = {
 RF_PARAMS = {
     'n_estimators': [10, 20, 50, 100, 300],
     'max_depth' : [3, 5, 10, 20, 50],
+}
+
+# kNN hyperparameters
+KNN_PARAMS = {
+    'n_neighbors': [1, 3, 5, 7, 9, 11],
+    'weights': ['uniform', 'distance'],
+    'metric': ['euclidean', 'manhattan', 'cosine']
 }
 
 # Few shot settings

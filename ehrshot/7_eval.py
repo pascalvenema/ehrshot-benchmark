@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from loguru import logger
 from sklearn.preprocessing import MaxAbsScaler
 from utils import (
@@ -25,6 +26,7 @@ from utils import (
     LR_PARAMS, 
     XGB_PARAMS, 
     RF_PARAMS,
+    KNN_PARAMS,
     ProtoNetCLMBRClassifier, 
     get_patient_splits_by_idx
 )
@@ -119,6 +121,15 @@ def run_evaluation(X_train: np.ndarray,
         # ProtoNet
         model = ProtoNetCLMBRClassifier()
         model.fit(X_train, y_train)
+    elif model_head_base == "knn":
+        # k-Nearest Neighbors
+        scaler = MaxAbsScaler().fit(X_train)
+        X_train = scaler.fit_transform(X_train)
+        X_val = scaler.transform(X_val)
+        X_test = scaler.transform(X_test)
+        model = KNeighborsClassifier()
+        model = tune_hyperparams(X_train, X_val, y_train, y_val, model, KNN_PARAMS, n_jobs=n_jobs)
+        logger.info(f"Best hparams: {model.get_params()}")
     else:
         raise ValueError(f"Model head `{model_head}` not supported.")
     logger.critical(f"Finish | Fitting {model_head}...")
