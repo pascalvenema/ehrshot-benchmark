@@ -63,6 +63,7 @@ SCORE_MODEL_HEAD_2_COLOR = {
         },
         'clmbr' : {
             'lr_lbfgs' : 'tab:blue',
+            'knn' : 'tab:purple',
         },
     },
     'auprc' : {
@@ -73,6 +74,7 @@ SCORE_MODEL_HEAD_2_COLOR = {
         },
         'clmbr' : {
             'lr_lbfgs' : 'tab:blue',
+            'knn' : 'tab:purple',
         },
         'pytorch_clmbr' : {
             'lr_femr' : 'tab:purple',
