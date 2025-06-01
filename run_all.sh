@@ -32,4 +32,4 @@ bash 7_eval.sh
 bash 8_make_results_plots.sh
 
 # Generate cohort statistics
-bash 9_make_cohort_plots.sh
+# bash 9_make_cohort_plots.sh

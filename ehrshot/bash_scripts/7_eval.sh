@@ -13,7 +13,7 @@ path_to_output_dir='../../EHRSHOT_ASSETS/results'
 path_to_split_csv='../../EHRSHOT_ASSETS/splits/person_id_map.csv'
 
 labeling_functions=(
-    "chexpert" # CheXpert first b/c slowest
+    # "chexpert" # CheXpert first b/c slowest
     "guo_los"
     "guo_readmission"
     "guo_icu"
