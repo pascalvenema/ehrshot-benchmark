@@ -225,10 +225,7 @@ if __name__ == "__main__":
         few_shots_dict: Dict[str, Dict] = json.load(f)
 
     # Preprocess certain non-binary labels
-    if LABELING_FUNCTION == "chexpert":
-        label_values = process_chexpert_labels(label_values)
-        sub_tasks: List[str] = CHEXPERT_LABELS
-    elif LABELING_FUNCTION.startswith('lab_'):
+    if LABELING_FUNCTION.startswith('lab_'):
        # Lab value is multi-class, convert to binary
         label_values = convert_multiclass_to_binary_labels(label_values, threshold=1)
         sub_tasks: List[str] = [LABELING_FUNCTION]
@@ -242,11 +239,15 @@ if __name__ == "__main__":
     
     # For each base model we are evaluating...
     for model in MODEL_2_INFO.keys():
+        # Skip if model features are not available (particularly for ClinicalBERT types 1 & 2)
+        if model not in feature_matrixes:
+            logger.warning(f"Feature matrix not found for `{model}`. Skipping this model.")
+            continue
+            
         model_heads: List[str] = MODEL_2_INFO[model]['heads']
         # For each head we can add to the top of this model...
         for head in model_heads:
             # Unpack each individual featurization we want to test
-            assert model in feature_matrixes, f"Feature matrix not found for `{model}`. Are you sure you have generated features for this model? If not, you'll need to rerun `generate_features.py` or `generate_clmbr_representations.py`."
             X_train: np.ndarray = feature_matrixes[model][train_pids_idx]
             X_val: np.ndarray = feature_matrixes[model][val_pids_idx]
             X_test: np.ndarray = feature_matrixes[model][test_pids_idx]
@@ -254,7 +255,6 @@ if __name__ == "__main__":
             
             # For each subtask in this task... 
             # NOTE: The "subtask" is just the same thing as LABELING_FUNCTION for all binary tasks.
-            # But for Chexpert, there are multiple subtasks, which of each represents a binary subtask
             for sub_task_idx, sub_task in enumerate(sub_tasks):
                 # Check if results already exist for this model/head/shot_strat in `results.csv`
                 if df_existing is not None:
@@ -293,10 +293,6 @@ if __name__ == "__main__":
                         y_train_k: np.ndarray = np.array(shot_dict['label_values_train_k'])
                         y_val_k: np.ndarray = np.array(shot_dict['label_values_val_k'])
                         y_test_k: np.ndarray = np.array(y_test)
-
-                        # CheXpert adjustment
-                        if LABELING_FUNCTION == 'chexpert':
-                            y_test_k = y_test[:, sub_task_idx]
 
                         # Fit model with hyperparameter tuning
                         best_model, scores = run_evaluation(X_train_k, X_val_k, X_test, y_train_k, y_val_k, y_test_k, model_head=head, n_jobs=NUM_THREADS)

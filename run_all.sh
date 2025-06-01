@@ -15,11 +15,11 @@ cd ehrshot/bash_scripts
 # bash 3_consolidate_labels.sh
 
 # Generate count-based feature representations
-bash 4_generate_count_features.sh
+# bash 4_generate_count_features.sh
 
 # Generate CLMBR-T-base feature representations for the patients in our cohort.
 # NOTE: This step requires a GPU
-bash 5_generate_clmbr_features.sh
+# bash 5_generate_clmbr_features.sh
 
 # Generate our k-shots for evaluation. 
 # NOTE: We provide the k-shots used in the EHRSHOT paper with our data release, so do not run this script if you want to replicate the paper. 

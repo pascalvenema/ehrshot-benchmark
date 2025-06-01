@@ -29,6 +29,45 @@ MODEL_2_INFO: Dict[str, Dict[str, Any]] = {
         'label' : 'CLMBR (v8)',
         'heads' : ['lr_lbfgs', 'knn'],
     },
+    # ClinicalBERT Type 1: Raw codes (tabular data without transformations)
+    'clinicalbert_type1_max_pool' : {
+        'label' : 'ClinicalBERT Type1 Max Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    'clinicalbert_type1_mean_pool' : {
+        'label' : 'ClinicalBERT Type1 Mean Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    'clinicalbert_type1_clinicalbert_pool' : {
+        'label' : 'ClinicalBERT Type1 ClinicalBERT Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    # ClinicalBERT Type 2: Code descriptions (codes transformed to textual descriptions)
+    'clinicalbert_type2_max_pool' : {
+        'label' : 'ClinicalBERT Type2 Max Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    'clinicalbert_type2_mean_pool' : {
+        'label' : 'ClinicalBERT Type2 Mean Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    'clinicalbert_type2_clinicalbert_pool' : {
+        'label' : 'ClinicalBERT Type2 ClinicalBERT Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    # ClinicalBERT Type 3: Human-readable format (manual transformation with logic rules, aggregated by day)
+    'clinicalbert_type3_max_pool' : {
+        'label' : 'ClinicalBERT Type3 Max Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    'clinicalbert_type3_mean_pool' : {
+        'label' : 'ClinicalBERT Type3 Mean Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
+    'clinicalbert_type3_clinicalbert_pool' : {
+        'label' : 'ClinicalBERT Type3 ClinicalBERT Pool',
+        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+    },
 }
 
 # Map each base model to a set of heads to test
@@ -65,6 +104,54 @@ SCORE_MODEL_HEAD_2_COLOR = {
             'lr_lbfgs' : 'tab:blue',
             'knn' : 'tab:purple',
         },
+        # ClinicalBERT Type 1 colors
+        'clinicalbert_type1_max_pool' : {
+            'lr_lbfgs' : 'darkred',
+            'knn' : 'lightcoral',
+            'rf' : 'crimson',
+        },
+        'clinicalbert_type1_mean_pool' : {
+            'lr_lbfgs' : 'darkgreen',
+            'knn' : 'lightgreen',
+            'rf' : 'forestgreen',
+        },
+        'clinicalbert_type1_clinicalbert_pool' : {
+            'lr_lbfgs' : 'darkblue',
+            'knn' : 'lightblue',
+            'rf' : 'navy',
+        },
+        # ClinicalBERT Type 2 colors
+        'clinicalbert_type2_max_pool' : {
+            'lr_lbfgs' : 'darkorange',
+            'knn' : 'peachpuff',
+            'rf' : 'chocolate',
+        },
+        'clinicalbert_type2_mean_pool' : {
+            'lr_lbfgs' : 'purple',
+            'knn' : 'plum',
+            'rf' : 'mediumorchid',
+        },
+        'clinicalbert_type2_clinicalbert_pool' : {
+            'lr_lbfgs' : 'teal',
+            'knn' : 'lightseagreen',
+            'rf' : 'darkslategray',
+        },
+        # ClinicalBERT Type 3 colors  
+        'clinicalbert_type3_max_pool' : {
+            'lr_lbfgs' : 'brown',
+            'knn' : 'tan',
+            'rf' : 'sienna',
+        },
+        'clinicalbert_type3_mean_pool' : {
+            'lr_lbfgs' : 'darkviolet',
+            'knn' : 'violet',
+            'rf' : 'mediumslateblue',
+        },
+        'clinicalbert_type3_clinicalbert_pool' : {
+            'lr_lbfgs' : 'goldenrod',
+            'knn' : 'gold',
+            'rf' : 'darkgoldenrod',
+        },
     },
     'auprc' : {
         'count' : {
@@ -78,6 +165,54 @@ SCORE_MODEL_HEAD_2_COLOR = {
         },
         'pytorch_clmbr' : {
             'lr_femr' : 'tab:purple',
+        },
+        # ClinicalBERT Type 1 colors (same as auroc)
+        'clinicalbert_type1_max_pool' : {
+            'lr_lbfgs' : 'darkred',
+            'knn' : 'lightcoral',
+            'rf' : 'crimson',
+        },
+        'clinicalbert_type1_mean_pool' : {
+            'lr_lbfgs' : 'darkgreen',
+            'knn' : 'lightgreen',
+            'rf' : 'forestgreen',
+        },
+        'clinicalbert_type1_clinicalbert_pool' : {
+            'lr_lbfgs' : 'darkblue',
+            'knn' : 'lightblue',
+            'rf' : 'navy',
+        },
+        # ClinicalBERT Type 2 colors (same as auroc)
+        'clinicalbert_type2_max_pool' : {
+            'lr_lbfgs' : 'darkorange',
+            'knn' : 'peachpuff',
+            'rf' : 'chocolate',
+        },
+        'clinicalbert_type2_mean_pool' : {
+            'lr_lbfgs' : 'purple',
+            'knn' : 'plum',
+            'rf' : 'mediumorchid',
+        },
+        'clinicalbert_type2_clinicalbert_pool' : {
+            'lr_lbfgs' : 'teal',
+            'knn' : 'lightseagreen',
+            'rf' : 'darkslategray',
+        },
+        # ClinicalBERT Type 3 colors (same as auroc)
+        'clinicalbert_type3_max_pool' : {
+            'lr_lbfgs' : 'brown',
+            'knn' : 'tan',
+            'rf' : 'sienna',
+        },
+        'clinicalbert_type3_mean_pool' : {
+            'lr_lbfgs' : 'darkviolet',
+            'knn' : 'violet',
+            'rf' : 'mediumslateblue',
+        },
+        'clinicalbert_type3_clinicalbert_pool' : {
+            'lr_lbfgs' : 'goldenrod',
+            'knn' : 'gold',
+            'rf' : 'darkgoldenrod',
         },
     },
 }
@@ -149,9 +284,6 @@ TASK_GROUP_2_LABELING_FUNCTION = {
         "new_celiac",
         "new_lupus",
         "new_acutemi"
-    ],
-    "chexpert": [
-        "chexpert"
     ]
 }
 
@@ -279,7 +411,14 @@ def get_labels_and_features(labeled_patients: LabeledPatients, path_to_features_
     featurizations: Dict[str, np.ndarray] = {}
     for model in MODEL_2_INFO.keys():
         path_to_feats_file: str = os.path.join(path_to_features_dir, f'{model}_features.pkl')
-        assert os.path.exists(path_to_feats_file), f'Path to file containing `{model}` features does not exist at this path: {path_to_feats_file}. Maybe you forgot to run `generate_features.py` first?'
+        
+        # Handle missing ClinicalBERT files gracefully (they might not exist yet for types 1 and 2)
+        if not os.path.exists(path_to_feats_file):
+            if model.startswith('clinicalbert_type1') or model.startswith('clinicalbert_type2'):
+                logger.warning(f'ClinicalBERT features not found at {path_to_feats_file}. Skipping {model}.')
+                continue
+            else:
+                assert False, f'Path to file containing `{model}` features does not exist at this path: {path_to_feats_file}. Maybe you forgot to run `generate_features.py` first?'
         
         with open(path_to_feats_file, 'rb') as f:
             # Load data and do type checking
