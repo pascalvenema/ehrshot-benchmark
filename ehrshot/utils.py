@@ -369,25 +369,28 @@ def compute_feature_label_alignment(label_pids, label_dates, feature_pids, featu
     result = np.zeros(label_pids.shape[0], dtype=np.uint32)
     j: int = 0
     for i in range(label_pids.shape[0]):
-        while True:
-            if j + 1 >= feature_pids.shape[0]:
+        # Find the matching feature entry for this label
+        while j < feature_pids.shape[0]:
+            if feature_pids[j] < label_pids[i]:
+                # Feature patient ID is smaller, advance to next feature
+                j += 1
+            elif feature_pids[j] > label_pids[i]:
+                # Feature patient ID is larger, no match possible
                 break
-            elif feature_pids[j] < label_pids[i]:
-                # Need to go ahead
-                pass
             else:
-                next_pid = feature_pids[j + 1]
-                next_date = feature_dates[j + 1]
-
-                if next_pid != label_pids[i]:
+                # Same patient ID, check the date
+                if feature_dates[j] < label_dates[i]:
+                    # Feature date is earlier, advance to next feature
+                    j += 1
+                elif feature_dates[j] > label_dates[i]:
+                    # Feature date is later, no match possible
+                    break
+                else:
+                    # Exact match found
                     break
 
-                if next_date > label_dates[i]:
-                    break
-            j += 1
-
-        if feature_pids[j] != label_pids[i] or feature_dates[j] != label_dates[i]:
-            raise RuntimeError(f"Could not find match for {label_pids[i]} {label_dates[i]}, closest is {feature_pids[j]} {feature_dates[j]}")
+        if j >= feature_pids.shape[0] or feature_pids[j] != label_pids[i] or feature_dates[j] != label_dates[i]:
+            raise RuntimeError(f"Could not find match for {label_pids[i]} {label_dates[i]}, closest is {feature_pids[j] if j < feature_pids.shape[0] else 'N/A'} {feature_dates[j] if j < feature_pids.shape[0] else 'N/A'}")
         result[i] = j
     return result
 
