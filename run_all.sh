@@ -26,7 +26,7 @@ cd ehrshot/bash_scripts
 # bash 6_generate_shots.sh
 
 # Train baseline models and generate metrics.
-bash 7_eval.sh
+# bash 7_eval.sh
 
 # Generate plots
 bash 8_make_results_plots.sh

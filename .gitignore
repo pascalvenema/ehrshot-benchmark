@@ -12,6 +12,7 @@ logs
 ehrshot/logs/
 data
 EHRSHOT_ASSETS*
+!EHRSHOT_ASSETS/results
 
 # Distribution / packaging
 .Python
