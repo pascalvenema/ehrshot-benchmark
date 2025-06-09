@@ -345,6 +345,351 @@ def plot_clinicalbert_pooling_comparison(df_results: pd.DataFrame,
     plt.close('all')
     return fig
 
+def plot_embedding_comparison_shared_heads(df_results: pd.DataFrame, 
+                                         score: str, 
+                                         path_to_output_dir: str):
+    """Compare CLMBR vs ClinicalBERT embeddings using shared prediction heads"""
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    
+    # Define shared heads that both CLMBR and ClinicalBERT use
+    shared_heads = ['lr_lbfgs', 'knn']
+    
+    # Define colors and styles for each head
+    head_styles = {
+        'lr_lbfgs': {'color': 'blue', 'linestyle': '-', 'marker': 's'},
+        'knn': {'color': 'red', 'linestyle': '--', 'marker': 'o'}
+    }
+    
+    for idx, task_group in enumerate(task_groups):
+        ax = axes.flat[idx]
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        
+        # Plot CLMBR performance for each head separately
+        for head in shared_heads:
+            clmbr_data = df_results[
+                (df_results['score'] == score) & 
+                (df_results['labeling_function'].isin(labeling_functions)) &
+                (df_results['model'] == 'clmbr') &
+                (df_results['head'] == head)
+            ]
+            
+            if not clmbr_data.empty:
+                clmbr_grouped = clmbr_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+                ax.errorbar(clmbr_grouped['k'], clmbr_grouped['mean'], yerr=clmbr_grouped['std'], 
+                           color=head_styles[head]['color'], 
+                           linestyle=head_styles[head]['linestyle'],
+                           marker=head_styles[head]['marker'], 
+                           label=f'CLMBR + {head.replace("_", " ").upper()}',
+                           linewidth=2, markersize=6, alpha=0.8)
+        
+        # Plot best ClinicalBERT performance for each head separately
+        cb_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+        
+        for head in shared_heads:
+            cb_data = df_results[
+                (df_results['score'] == score) & 
+                (df_results['labeling_function'].isin(labeling_functions)) &
+                (df_results['model'].isin(cb_models)) &
+                (df_results['head'] == head)
+            ]
+            
+            if not cb_data.empty:
+                # Find best ClinicalBERT model for this head at full data
+                full_data_cb = cb_data[cb_data['k'] == -1]
+                if not full_data_cb.empty:
+                    best_cb_model = full_data_cb.groupby('model')['value'].mean().idxmax()
+                    best_cb_data = cb_data[cb_data['model'] == best_cb_model]
+                    cb_grouped = best_cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+                    
+                    # Use lighter version of same color and different marker
+                    light_color = head_styles[head]['color'] if head_styles[head]['color'] != 'blue' else 'lightblue'
+                    light_color = 'lightcoral' if head_styles[head]['color'] == 'red' else light_color
+                    
+                    ax.errorbar(cb_grouped['k'], cb_grouped['mean'], yerr=cb_grouped['std'], 
+                               color=light_color,
+                               linestyle=head_styles[head]['linestyle'],
+                               marker='^' if head_styles[head]['marker'] == 's' else 'v',
+                               label=f'Best ClinicalBERT + {head.replace("_", " ").upper()}',
+                               linewidth=2, markersize=6, alpha=0.8)
+        
+        ax.set_xlabel('K (Number of Training Examples)', fontsize=10)
+        ax.set_ylabel(f'{score.upper()}', fontsize=10)
+        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=12)
+        ax.set_xscale('log')
+        ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
+        ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8)
+    
+    fig.suptitle(f'CLMBR vs ClinicalBERT Embeddings by Prediction Head - {score.upper()}', fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92)
+    plt.savefig(os.path.join(path_to_output_dir, f"embedding_comparison_shared_heads_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
+def plot_linear_vs_nonlinear_heads(df_results: pd.DataFrame, 
+                                  score: str, 
+                                  path_to_output_dir: str):
+    """Compare linear vs non-linear prediction heads for embedding models"""
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    
+    # Define head categories
+    linear_heads = ['lr_lbfgs']
+    nonlinear_heads = ['knn', 'rf', 'gbm']
+    
+    # Models to analyze
+    embedding_models = ['clmbr'] + [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+    
+    for idx, task_group in enumerate(task_groups):
+        ax = axes.flat[idx]
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        
+        # Compare linear vs non-linear for CLMBR
+        clmbr_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'] == 'clmbr') &
+            (df_results['k'] == -1)  # Full data only
+        ]
+        
+        if not clmbr_data.empty:
+            # Linear performance
+            linear_clmbr = clmbr_data[clmbr_data['head'].isin(linear_heads)]['value'].mean()
+            # Non-linear performance  
+            nonlinear_clmbr = clmbr_data[clmbr_data['head'].isin(nonlinear_heads)]['value'].mean()
+            
+            ax.scatter([1], [linear_clmbr], color='blue', s=100, marker='s', label='CLMBR Linear', alpha=0.7)
+            ax.scatter([2], [nonlinear_clmbr], color='blue', s=100, marker='^', label='CLMBR Non-linear', alpha=0.7)
+        
+        # Compare linear vs non-linear for ClinicalBERT (average across all CB models)
+        cb_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+        cb_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'].isin(cb_models)) &
+            (df_results['k'] == -1)  # Full data only
+        ]
+        
+        if not cb_data.empty:
+            # Linear performance
+            linear_cb = cb_data[cb_data['head'].isin(linear_heads)]['value'].mean()
+            # Non-linear performance
+            nonlinear_cb = cb_data[cb_data['head'].isin(nonlinear_heads)]['value'].mean()
+            
+            ax.scatter([1.1], [linear_cb], color='red', s=100, marker='s', label='ClinicalBERT Linear', alpha=0.7)
+            ax.scatter([2.1], [nonlinear_cb], color='red', s=100, marker='^', label='ClinicalBERT Non-linear', alpha=0.7)
+        
+        # Add count-based models for reference
+        count_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'] == 'count') &
+            (df_results['k'] == -1)  # Full data only
+        ]
+        
+        if not count_data.empty:
+            linear_count = count_data[count_data['head'].isin(linear_heads)]['value'].mean()
+            nonlinear_count = count_data[count_data['head'].isin(nonlinear_heads)]['value'].mean()
+            
+            ax.scatter([0.9], [linear_count], color='green', s=100, marker='s', label='Count Linear', alpha=0.7)
+            ax.scatter([1.9], [nonlinear_count], color='green', s=100, marker='^', label='Count Non-linear', alpha=0.7)
+        
+        ax.set_xlim(0.5, 2.5)
+        ax.set_xticks([1, 2])
+        ax.set_xticklabels(['Linear\n(LR)', 'Non-Linear\n(KNN, RF, GBM)'])
+        ax.set_ylabel(f'{score.upper()}', fontsize=10)
+        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=12)
+        ax.grid(True, alpha=0.3)
+        if idx == 0:  # Only show legend for first subplot
+            ax.legend(fontsize=8, loc='best')
+    
+    # Use the remaining subplots for summary analysis
+    # Subplot 4: Overall improvement analysis
+    ax = axes.flat[4]
+    
+    improvements = {'CLMBR': [], 'ClinicalBERT': [], 'Count': []}
+    
+    for task_group in task_groups:
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        
+        # CLMBR improvement
+        clmbr_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'] == 'clmbr') & (df_results['k'] == -1)
+        ]
+        if not clmbr_data.empty:
+            linear_perf = clmbr_data[clmbr_data['head'].isin(linear_heads)]['value'].mean()
+            nonlinear_perf = clmbr_data[clmbr_data['head'].isin(nonlinear_heads)]['value'].mean()
+            improvements['CLMBR'].append(nonlinear_perf - linear_perf)
+        
+        # ClinicalBERT improvement
+        cb_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'].isin(cb_models)) & (df_results['k'] == -1)
+        ]
+        if not cb_data.empty:
+            linear_perf = cb_data[cb_data['head'].isin(linear_heads)]['value'].mean()
+            nonlinear_perf = cb_data[cb_data['head'].isin(nonlinear_heads)]['value'].mean()
+            improvements['ClinicalBERT'].append(nonlinear_perf - linear_perf)
+        
+        # Count improvement
+        count_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'] == 'count') & (df_results['k'] == -1)
+        ]
+        if not count_data.empty:
+            linear_perf = count_data[count_data['head'].isin(linear_heads)]['value'].mean()
+            nonlinear_perf = count_data[count_data['head'].isin(nonlinear_heads)]['value'].mean()
+            improvements['Count'].append(nonlinear_perf - linear_perf)
+    
+    # Create box plot of improvements
+    improvement_data = [improvements['CLMBR'], improvements['ClinicalBERT'], improvements['Count']]
+    bp = ax.boxplot(improvement_data, labels=['CLMBR', 'ClinicalBERT', 'Count'], patch_artist=True)
+    colors = ['blue', 'red', 'green']
+    for patch, color in zip(bp['boxes'], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+    
+    ax.axhline(y=0, color='black', linestyle='--', alpha=0.5)
+    ax.set_ylabel(f'Non-linear - Linear {score.upper()}', fontsize=10)
+    ax.set_title('Head Type Performance Difference', fontsize=12)
+    ax.grid(True, alpha=0.3)
+    
+    # Subplot 5: Summary statistics
+    ax = axes.flat[5]
+    ax.axis('off')
+    
+    # Calculate summary statistics
+    summary_text = f"Summary Statistics ({score.upper()}):\n\n"
+    
+    for model_type, imps in improvements.items():
+        if imps:
+            mean_imp = np.mean(imps)
+            summary_text += f"{model_type}:\n"
+            summary_text += f"  Mean improvement: {mean_imp:+.3f}\n"
+            summary_text += f"  Tasks improved: {sum(1 for x in imps if x > 0)}/{len(imps)}\n\n"
+    
+    ax.text(0.1, 0.8, summary_text, fontsize=11, verticalalignment='top', 
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgray", alpha=0.5))
+    
+    fig.suptitle(f'Linear vs Non-Linear Prediction Heads - {score.upper()}', fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92)
+    plt.savefig(os.path.join(path_to_output_dir, f"linear_vs_nonlinear_heads_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
+def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame, 
+                                          score: str, 
+                                          path_to_output_dir: str):
+    """Create detailed task-by-task comparison of CLMBR vs ClinicalBERT for shared heads"""
+    
+    # Get tasks with both CLMBR and ClinicalBERT data
+    shared_heads = ['lr_lbfgs', 'knn']
+    cb_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+    
+    valid_tasks = []
+    for task in df_results['labeling_function'].unique():
+        clmbr_data = df_results[
+            (df_results['labeling_function'] == task) &
+            (df_results['model'] == 'clmbr') &
+            (df_results['head'].isin(shared_heads)) &
+            (df_results['score'] == score)
+        ]
+        cb_data = df_results[
+            (df_results['labeling_function'] == task) &
+            (df_results['model'].isin(cb_models)) &
+            (df_results['head'].isin(shared_heads)) &
+            (df_results['score'] == score)
+        ]
+        if not clmbr_data.empty and not cb_data.empty:
+            valid_tasks.append(task)
+    
+    if len(valid_tasks) == 0:
+        print(f"No valid tasks found for detailed comparison ({score})")
+        return None
+    
+    # Create subplot grid based on number of tasks
+    n_tasks = len(valid_tasks)
+    n_cols = 4
+    n_rows = (n_tasks + n_cols - 1) // n_cols
+    
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, 5*n_rows))
+    if n_rows == 1:
+        axes = axes.reshape(1, -1)
+    
+    for idx, task in enumerate(valid_tasks):
+        row = idx // n_cols
+        col = idx % n_cols
+        ax = axes[row, col]
+        
+        for head in shared_heads:
+            # CLMBR data
+            clmbr_data = df_results[
+                (df_results['labeling_function'] == task) &
+                (df_results['model'] == 'clmbr') &
+                (df_results['head'] == head) &
+                (df_results['score'] == score) &
+                (df_results['k'] == -1)  # Full data only for clarity
+            ]
+            
+            # Best ClinicalBERT data for this head
+            cb_data = df_results[
+                (df_results['labeling_function'] == task) &
+                (df_results['model'].isin(cb_models)) &
+                (df_results['head'] == head) &
+                (df_results['score'] == score) &
+                (df_results['k'] == -1)
+            ]
+            
+            if not clmbr_data.empty and not cb_data.empty:
+                clmbr_perf = clmbr_data['value'].mean()
+                best_cb_perf = cb_data.groupby('model')['value'].mean().max()
+                
+                # Plot bars for this head
+                x_pos = 0 if head == 'lr_lbfgs' else 1
+                bar_width = 0.35
+                
+                ax.bar(x_pos - bar_width/2, clmbr_perf, bar_width, 
+                      label=f'CLMBR' if head == 'lr_lbfgs' else '', 
+                      color='blue', alpha=0.7)
+                ax.bar(x_pos + bar_width/2, best_cb_perf, bar_width, 
+                      label=f'Best ClinicalBERT' if head == 'lr_lbfgs' else '', 
+                      color='red', alpha=0.7)
+                
+                # Add value labels on bars
+                ax.text(x_pos - bar_width/2, clmbr_perf + 0.01, f'{clmbr_perf:.3f}', 
+                       ha='center', va='bottom', fontsize=8)
+                ax.text(x_pos + bar_width/2, best_cb_perf + 0.01, f'{best_cb_perf:.3f}', 
+                       ha='center', va='bottom', fontsize=8)
+        
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(['LR', 'KNN'])
+        ax.set_ylabel(f'{score.upper()}', fontsize=10)
+        ax.set_title(LABELING_FUNCTION_2_PAPER_NAME.get(task, task), fontsize=10)
+        ax.grid(True, alpha=0.3, axis='y')
+        if idx == 0:
+            ax.legend(fontsize=8)
+    
+    # Hide unused subplots
+    for idx in range(n_tasks, n_rows * n_cols):
+        row = idx // n_cols
+        col = idx % n_cols
+        axes[row, col].set_visible(False)
+    
+    fig.suptitle(f'CLMBR vs Best ClinicalBERT by Task and Prediction Head - {score.upper()}', fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.95)
+    plt.savefig(os.path.join(path_to_output_dir, f"detailed_task_embedding_comparison_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
 def merge_html_tables(path_to_output_dir: str):
     # Merge together all HTML tables for easy copying
     html_contents = []
@@ -570,5 +915,20 @@ if __name__ == "__main__":
         for score in tqdm(df_results['score'].unique(), desc=f'plot_clinicalbert_{cb_type}_pooling()'):
             if score == 'brier': continue
             plot_clinicalbert_pooling_comparison(df_results, score, clinicalbert_dir, cb_type)
+    
+    # Plot embedding comparison using shared heads
+    for score in tqdm(df_results['score'].unique(), desc='plot_embedding_comparison_shared_heads()'):
+        if score == 'brier': continue
+        plot_embedding_comparison_shared_heads(df_results, score, clinicalbert_dir)
+    
+    # Plot linear vs non-linear prediction heads
+    for score in tqdm(df_results['score'].unique(), desc='plot_linear_vs_nonlinear_heads()'):
+        if score == 'brier': continue
+        plot_linear_vs_nonlinear_heads(df_results, score, clinicalbert_dir)
+    
+    # Plot detailed task embedding comparison
+    for score in tqdm(df_results['score'].unique(), desc='plot_detailed_task_embedding_comparison()'):
+        if score == 'brier': continue
+        plot_detailed_task_embedding_comparison(df_results, score, clinicalbert_dir)
     
     print(f"ClinicalBERT plots saved to {clinicalbert_dir}")
