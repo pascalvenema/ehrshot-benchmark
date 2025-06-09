@@ -13,5 +13,5 @@ python3 ../8_make_results_plots.py \
     --path_to_labels_and_feats_dir ../../EHRSHOT_ASSETS/benchmark \
     --path_to_results_dir ../../EHRSHOT_ASSETS/results \
     --path_to_output_dir ../../EHRSHOT_ASSETS/figures \
-    --model_heads "[('clmbr', 'lr_lbfgs'), ('clmbr', 'knn'), ('count', 'lr_lbfgs'), ('count', 'gbm'), ('count', 'rf')]" \
+    --model_heads "[('clmbr', 'lr_lbfgs'), ('clmbr', 'knn'), ('count', 'lr_lbfgs'), ('count', 'gbm'), ('count', 'rf'), ('clinicalbert_type3_max_pool', 'lr_lbfgs'), ('clinicalbert_type3_mean_pool', 'lr_lbfgs'), ('clinicalbert_type3_clinicalbert_pool', 'lr_lbfgs')]" \
     --shot_strat all

@@ -5,6 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+import numpy as np
 from utils import (
     LABELING_FUNCTION_2_PAPER_NAME, 
     TASK_GROUP_2_PAPER_NAME,
@@ -115,6 +116,234 @@ def plot_all_task_group_box_plots(df_results: pd.DataFrame,
     plt.close('all')
     return fig
 
+def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame, 
+                                        score: str, 
+                                        path_to_output_dir: str,
+                                        is_x_scale_log: bool = True):
+    """Plot comparison of ClinicalBERT Type 1, 2, and 3 models"""
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    
+    # Filter for only ClinicalBERT models
+    clinicalbert_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+    
+    for idx, task_group in enumerate(task_groups):
+        ax = axes.flat[idx]
+        
+        # Get data for this task group
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        df_group = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'].isin(clinicalbert_models))
+        ]
+        
+        if df_group.empty:
+            ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]} - No ClinicalBERT Data', fontsize=12)
+            continue
+            
+        # Group by ClinicalBERT type
+        type1_data = df_group[df_group['model'].str.contains('type1')]
+        type2_data = df_group[df_group['model'].str.contains('type2')]  
+        type3_data = df_group[df_group['model'].str.contains('type3')]
+        
+        # Plot mean performance for each type
+        for cb_type, cb_data, color, label in [
+            ('type1', type1_data, 'red', 'ClinicalBERT Type 1'),
+            ('type2', type2_data, 'blue', 'ClinicalBERT Type 2'),
+            ('type3', type3_data, 'green', 'ClinicalBERT Type 3')
+        ]:
+            if cb_data.empty:
+                continue
+                
+            # Group by k-value and compute mean across all models/heads of this type
+            grouped = cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+            
+            # Plot line with error bars
+            ax.errorbar(grouped['k'], grouped['mean'], yerr=grouped['std'], 
+                       color=color, label=label, marker='o', linewidth=2, markersize=6)
+        
+        ax.set_xlabel('K (Number of Training Examples)', fontsize=10)
+        ax.set_ylabel(f'{score.upper()}', fontsize=10)
+        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=12)
+        
+        if is_x_scale_log:
+            ax.set_xscale('log')
+            ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
+            ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+        
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8)
+    
+    fig.suptitle(f'ClinicalBERT Type Comparison - {score.upper()}', fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92)
+    plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_type_comparison_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
+def plot_best_clinicalbert_models(df_results: pd.DataFrame, 
+                                 score: str, 
+                                 path_to_output_dir: str,
+                                 top_n: int = 5):
+    """Plot the best performing ClinicalBERT models across all tasks"""
+    # Filter for ClinicalBERT models and full data (k=-1)
+    clinicalbert_data = df_results[
+        (df_results['model'].str.contains('clinicalbert')) &
+        (df_results['score'] == score) &
+        (df_results['k'] == -1)
+    ]
+    
+    if clinicalbert_data.empty:
+        print(f"No ClinicalBERT data found for {score}")
+        return None
+    
+    # Calculate mean performance for each model+head combination
+    model_performance = clinicalbert_data.groupby(['model', 'head'])['value'].agg(['mean', 'std']).reset_index()
+    model_performance['model_head'] = model_performance['model'] + '+' + model_performance['head']
+    
+    # Sort by mean performance and take top N
+    model_performance = model_performance.sort_values('mean', ascending=False).head(top_n)
+    
+    # Create horizontal bar plot
+    fig, ax = plt.subplots(figsize=(12, 8))
+    
+    y_pos = np.arange(len(model_performance))
+    bars = ax.barh(y_pos, model_performance['mean'], xerr=model_performance['std'], 
+                   color=plt.cm.Set3(np.linspace(0, 1, len(model_performance))))
+    
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(model_performance['model_head'], fontsize=10)
+    ax.set_xlabel(f'{score.upper()} Score', fontsize=12)
+    ax.set_title(f'Top {top_n} ClinicalBERT Models (Full Data Performance)', fontsize=14)
+    ax.grid(True, alpha=0.3, axis='x')
+    
+    # Add value labels on bars
+    for i, (bar, mean_val, std_val) in enumerate(zip(bars, model_performance['mean'], model_performance['std'])):
+        ax.text(bar.get_width() + std_val + 0.01, bar.get_y() + bar.get_height()/2, 
+                f'{mean_val:.3f}±{std_val:.3f}', va='center', fontsize=9)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(path_to_output_dir, f"best_clinicalbert_models_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
+def plot_clinicalbert_vs_baseline_comparison(df_results: pd.DataFrame, 
+                                           score: str, 
+                                           path_to_output_dir: str):
+    """Compare best ClinicalBERT models against baseline models"""
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    
+    # Define baseline and ClinicalBERT models
+    baseline_models = ['clmbr', 'count']
+    clinicalbert_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+    
+    for idx, task_group in enumerate(task_groups):
+        ax = axes.flat[idx]
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        
+        # Get baseline data
+        baseline_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'].isin(baseline_models))
+        ]
+        
+        # Get ClinicalBERT data
+        cb_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'].isin(clinicalbert_models))
+        ]
+        
+        if baseline_data.empty and cb_data.empty:
+            ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]} - No Data', fontsize=12)
+            continue
+        
+        # Plot baseline models
+        for model in baseline_models:
+            model_data = baseline_data[baseline_data['model'] == model]
+            if not model_data.empty:
+                grouped = model_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+                ax.errorbar(grouped['k'], grouped['mean'], yerr=grouped['std'], 
+                           label=f'{MODEL_2_INFO[model]["label"]}', linewidth=2, marker='s', markersize=6)
+        
+        # Plot best ClinicalBERT model (by full data performance)
+        if not cb_data.empty:
+            full_data_cb = cb_data[cb_data['k'] == -1]
+            if not full_data_cb.empty:
+                best_cb_combo = full_data_cb.groupby(['model', 'head'])['value'].mean().idxmax()
+                best_cb_data = cb_data[
+                    (cb_data['model'] == best_cb_combo[0]) & 
+                    (cb_data['head'] == best_cb_combo[1])
+                ]
+                grouped = best_cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+                
+                cb_label = f"Best ClinicalBERT ({best_cb_combo[0].replace('clinicalbert_', '').replace('_', ' ').title()})"
+                ax.errorbar(grouped['k'], grouped['mean'], yerr=grouped['std'], 
+                           label=cb_label, linewidth=2, marker='o', markersize=6, color='purple')
+        
+        ax.set_xlabel('K (Number of Training Examples)', fontsize=10)
+        ax.set_ylabel(f'{score.upper()}', fontsize=10)
+        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=12)
+        ax.set_xscale('log')
+        ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
+        ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8)
+    
+    fig.suptitle(f'ClinicalBERT vs Baseline Models - {score.upper()}', fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92)
+    plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_vs_baseline_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
+def plot_clinicalbert_pooling_comparison(df_results: pd.DataFrame, 
+                                       score: str, 
+                                       path_to_output_dir: str,
+                                       cb_type: str = 'type3'):
+    """Compare different pooling strategies for a specific ClinicalBERT type"""
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    
+    pooling_strategies = ['max_pool', 'mean_pool', 'clinicalbert_pool']
+    colors = ['red', 'blue', 'green']
+    
+    for idx, task_group in enumerate(task_groups):
+        ax = axes.flat[idx]
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        
+        for pool_strategy, color in zip(pooling_strategies, colors):
+            model_name = f'clinicalbert_{cb_type}_{pool_strategy}'
+            model_data = df_results[
+                (df_results['score'] == score) & 
+                (df_results['labeling_function'].isin(labeling_functions)) &
+                (df_results['model'] == model_name)
+            ]
+            
+            if not model_data.empty:
+                grouped = model_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+                ax.errorbar(grouped['k'], grouped['mean'], yerr=grouped['std'], 
+                           color=color, label=pool_strategy.replace('_', ' ').title(), 
+                           linewidth=2, marker='o', markersize=6)
+        
+        ax.set_xlabel('K (Number of Training Examples)', fontsize=10)
+        ax.set_ylabel(f'{score.upper()}', fontsize=10)
+        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=12)
+        ax.set_xscale('log')
+        ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
+        ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8)
+    
+    fig.suptitle(f'ClinicalBERT {cb_type.upper()} Pooling Strategies - {score.upper()}', fontsize=16)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92)
+    plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_{cb_type}_pooling_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
 
 def merge_html_tables(path_to_output_dir: str):
     # Merge together all HTML tables for easy copying
@@ -306,3 +535,40 @@ if __name__ == "__main__":
         if score == 'brier': continue
         plot_all_task_group_box_plots(df_results, score, path_to_output_dir=PATH_TO_OUTPUT_DIR,
                                       model_heads=MODEL_HEADS)
+
+    ####################################
+    ####################################
+    #
+    # ClinicalBERT-specific Plots
+    #
+    ####################################
+    ####################################
+    
+    print("Creating ClinicalBERT-specific visualizations...")
+    
+    # Create directory for ClinicalBERT plots
+    clinicalbert_dir = os.path.join(PATH_TO_OUTPUT_DIR, 'clinicalbert')
+    os.makedirs(clinicalbert_dir, exist_ok=True)
+    
+    # Plot ClinicalBERT type comparisons
+    for score in tqdm(df_results['score'].unique(), desc='plot_clinicalbert_type_comparison()'):
+        if score == 'brier': continue
+        plot_clinicalbert_comparison_by_type(df_results, score, clinicalbert_dir)
+    
+    # Plot best ClinicalBERT models
+    for score in tqdm(df_results['score'].unique(), desc='plot_best_clinicalbert_models()'):
+        if score == 'brier': continue
+        plot_best_clinicalbert_models(df_results, score, clinicalbert_dir, top_n=10)
+    
+    # Plot ClinicalBERT vs baseline comparison
+    for score in tqdm(df_results['score'].unique(), desc='plot_clinicalbert_vs_baseline()'):
+        if score == 'brier': continue
+        plot_clinicalbert_vs_baseline_comparison(df_results, score, clinicalbert_dir)
+    
+    # Plot pooling strategy comparisons for each ClinicalBERT type
+    for cb_type in ['type1', 'type2', 'type3']:
+        for score in tqdm(df_results['score'].unique(), desc=f'plot_clinicalbert_{cb_type}_pooling()'):
+            if score == 'brier': continue
+            plot_clinicalbert_pooling_comparison(df_results, score, clinicalbert_dir, cb_type)
+    
+    print(f"ClinicalBERT plots saved to {clinicalbert_dir}")

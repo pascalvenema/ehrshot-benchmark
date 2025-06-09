@@ -3,10 +3,18 @@
 #SBATCH --output=logs/7__eval_helper_%A.out
 #SBATCH --error=logs/7__eval_helper_%A.err
 #SBATCH --time=2-00:00:00
-#SBATCH --partition=normal,gpu,nigam-v100
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus-per-node=2
 #SBATCH --mem=200G
 #SBATCH --cpus-per-task=20
-#SBATCH --exclude=secure-gpu-3,secure-gpu-4,secure-gpu-5,secure-gpu-6,secure-gpu-7
+
+module load 2024
+module load Miniconda3/24.7.1-0
+
+# Activate your environment
+source activate EHRSHOT_ENV
+# Check whether the GPU is available
+srun python -uc "import torch; print('GPU available?', torch.cuda.is_available())"
 
 python3 ../7_eval.py \
     --path_to_database $1 \
