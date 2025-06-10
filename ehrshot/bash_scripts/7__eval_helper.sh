@@ -2,7 +2,7 @@
 #SBATCH --job-name=7__eval_helper
 #SBATCH --output=logs/7__eval_helper_%A.out
 #SBATCH --error=logs/7__eval_helper_%A.err
-#SBATCH --time=2-00:00:00
+#SBATCH --time=12:00:00
 #SBATCH --partition=gpu_a100
 #SBATCH --gpus-per-node=2
 #SBATCH --mem=200G
