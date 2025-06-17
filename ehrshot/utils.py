@@ -27,7 +27,7 @@ MODEL_2_INFO: Dict[str, Dict[str, Any]] = {
     },
     'clmbr' : {
         'label' : 'CLMBR (v8)',
-        'heads' : ['lr_lbfgs', 'knn'],
+        'heads' : ['lr_lbfgs', 'knn', 'rf', 'gbm'],
     },
     # ClinicalBERT Type 1: Raw codes (tabular data without transformations)
     'clinicalbert_type1_max_pool' : {
@@ -66,7 +66,7 @@ MODEL_2_INFO: Dict[str, Dict[str, Any]] = {
     },
     'clinicalbert_type3_clinicalbert_pool' : {
         'label' : 'ClinicalBERT Type3 ClinicalBERT Pool',
-        'heads' : ['lr_lbfgs', 'knn', 'rf'],
+        'heads' : ['lr_lbfgs', 'knn', 'rf', 'gbm'],
     },
 }
 
@@ -103,54 +103,65 @@ SCORE_MODEL_HEAD_2_COLOR = {
         'clmbr' : {
             'lr_lbfgs' : 'tab:blue',
             'knn' : 'tab:purple',
+            'rf' : 'tab:brown',
+            'gbm' : 'tab:pink',
         },
         # ClinicalBERT Type 1 colors
         'clinicalbert_type1_max_pool' : {
             'lr_lbfgs' : 'darkred',
             'knn' : 'lightcoral',
             'rf' : 'crimson',
+            'gbm' : 'firebrick',
         },
         'clinicalbert_type1_mean_pool' : {
             'lr_lbfgs' : 'darkgreen',
             'knn' : 'lightgreen',
             'rf' : 'forestgreen',
+            'gbm' : 'olive',
         },
         'clinicalbert_type1_clinicalbert_pool' : {
             'lr_lbfgs' : 'darkblue',
             'knn' : 'lightblue',
             'rf' : 'navy',
+            'gbm' : 'steelblue',
         },
         # ClinicalBERT Type 2 colors
         'clinicalbert_type2_max_pool' : {
             'lr_lbfgs' : 'darkorange',
             'knn' : 'peachpuff',
             'rf' : 'chocolate',
+            'gbm' : 'coral',
         },
         'clinicalbert_type2_mean_pool' : {
             'lr_lbfgs' : 'purple',
             'knn' : 'plum',
             'rf' : 'mediumorchid',
+            'gbm' : 'indigo',
         },
         'clinicalbert_type2_clinicalbert_pool' : {
             'lr_lbfgs' : 'teal',
             'knn' : 'lightseagreen',
             'rf' : 'darkslategray',
+            'gbm' : 'darkcyan',
         },
         # ClinicalBERT Type 3 colors  
         'clinicalbert_type3_max_pool' : {
             'lr_lbfgs' : 'brown',
             'knn' : 'tan',
             'rf' : 'sienna',
+            'gbm' : 'maroon',
         },
         'clinicalbert_type3_mean_pool' : {
             'lr_lbfgs' : 'darkviolet',
             'knn' : 'violet',
             'rf' : 'mediumslateblue',
+            'gbm' : 'slateblue',
         },
         'clinicalbert_type3_clinicalbert_pool' : {
             'lr_lbfgs' : 'goldenrod',
             'knn' : 'gold',
             'rf' : 'darkgoldenrod',
+            'gbm' : 'orange',
         },
     },
     'auprc' : {
@@ -162,6 +173,8 @@ SCORE_MODEL_HEAD_2_COLOR = {
         'clmbr' : {
             'lr_lbfgs' : 'tab:blue',
             'knn' : 'tab:purple',
+            'rf' : 'tab:brown',
+            'gbm' : 'tab:pink',
         },
         'pytorch_clmbr' : {
             'lr_femr' : 'tab:purple',
@@ -171,48 +184,57 @@ SCORE_MODEL_HEAD_2_COLOR = {
             'lr_lbfgs' : 'darkred',
             'knn' : 'lightcoral',
             'rf' : 'crimson',
+            'gbm' : 'firebrick',
         },
         'clinicalbert_type1_mean_pool' : {
             'lr_lbfgs' : 'darkgreen',
             'knn' : 'lightgreen',
             'rf' : 'forestgreen',
+            'gbm' : 'olive',
         },
         'clinicalbert_type1_clinicalbert_pool' : {
             'lr_lbfgs' : 'darkblue',
             'knn' : 'lightblue',
             'rf' : 'navy',
+            'gbm' : 'steelblue',
         },
         # ClinicalBERT Type 2 colors (same as auroc)
         'clinicalbert_type2_max_pool' : {
             'lr_lbfgs' : 'darkorange',
             'knn' : 'peachpuff',
             'rf' : 'chocolate',
+            'gbm' : 'coral',
         },
         'clinicalbert_type2_mean_pool' : {
             'lr_lbfgs' : 'purple',
             'knn' : 'plum',
             'rf' : 'mediumorchid',
+            'gbm' : 'indigo',
         },
         'clinicalbert_type2_clinicalbert_pool' : {
             'lr_lbfgs' : 'teal',
             'knn' : 'lightseagreen',
             'rf' : 'darkslategray',
+            'gbm' : 'darkcyan',
         },
         # ClinicalBERT Type 3 colors (same as auroc)
         'clinicalbert_type3_max_pool' : {
             'lr_lbfgs' : 'brown',
             'knn' : 'tan',
             'rf' : 'sienna',
+            'gbm' : 'maroon',
         },
         'clinicalbert_type3_mean_pool' : {
             'lr_lbfgs' : 'darkviolet',
             'knn' : 'violet',
             'rf' : 'mediumslateblue',
+            'gbm' : 'slateblue',
         },
         'clinicalbert_type3_clinicalbert_pool' : {
             'lr_lbfgs' : 'goldenrod',
             'knn' : 'gold',
             'rf' : 'darkgoldenrod',
+            'gbm' : 'orange',
         },
     },
 }

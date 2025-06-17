@@ -120,65 +120,78 @@ def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame,
                                         score: str, 
                                         path_to_output_dir: str,
                                         is_x_scale_log: bool = True):
-    """Plot comparison of ClinicalBERT Type 1, 2, and 3 models"""
-    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    """Plot comparison of ClinicalBERT Type 1, 2, and 3 models with all tasks aggregated"""
+    # Create a single figure instead of subplots
+    fig, ax = plt.subplots(1, 1, figsize=(12, 8))
     
-    # Filter for only ClinicalBERT models
+    # Filter for only ClinicalBERT models and aggregate ALL tasks
     clinicalbert_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
     
-    for idx, task_group in enumerate(task_groups):
-        ax = axes.flat[idx]
+    # Get data for ALL tasks (aggregated across all task groups)
+    all_labeling_functions = []
+    for task_group_functions in TASK_GROUP_2_LABELING_FUNCTION.values():
+        all_labeling_functions.extend(task_group_functions)
+    
+    df_all_tasks = df_results[
+        (df_results['score'] == score) & 
+        (df_results['labeling_function'].isin(all_labeling_functions)) &
+        (df_results['model'].isin(clinicalbert_models)) &
+        (df_results['head'] == 'lr_lbfgs')  # Use only lr_lbfgs head
+    ]
+    
+    if df_all_tasks.empty:
+        plt.tight_layout()
+        plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_type_comparison_{score}.png"), dpi=300)
+        plt.close('all')
+        return fig
         
-        # Get data for this task group
-        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
-        df_group = df_results[
-            (df_results['score'] == score) & 
-            (df_results['labeling_function'].isin(labeling_functions)) &
-            (df_results['model'].isin(clinicalbert_models))
-        ]
-        
-        if df_group.empty:
-            ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]} - No ClinicalBERT Data', fontsize=12)
+    # Group by ClinicalBERT type - USE ONLY clinicalbert_pool strategy with lr_lbfgs head
+    type1_data = df_all_tasks[df_all_tasks['model'] == 'clinicalbert_type1_clinicalbert_pool']
+    type2_data = df_all_tasks[df_all_tasks['model'] == 'clinicalbert_type2_clinicalbert_pool']  
+    type3_data = df_all_tasks[df_all_tasks['model'] == 'clinicalbert_type3_clinicalbert_pool']
+    
+    # Updated colors as requested: type1=blue, type2=green, type3=red
+    # Use confidence interval lines instead of overlapping shaded areas
+    for cb_type, cb_data, color, label in [
+        ('type1', type1_data, '#1f77b4', 'ClinicalBERT Type 1+LR'),
+        ('type2', type2_data, '#2ca02c', 'ClinicalBERT Type 2+LR'),
+        ('type3', type3_data, '#d62728', 'ClinicalBERT Type 3+LR')
+    ]:
+        if cb_data.empty:
             continue
             
-        # Group by ClinicalBERT type
-        type1_data = df_group[df_group['model'].str.contains('type1')]
-        type2_data = df_group[df_group['model'].str.contains('type2')]  
-        type3_data = df_group[df_group['model'].str.contains('type3')]
+        # Group by k-value and compute mean/std across tasks for clinicalbert_pool + lr_lbfgs
+        grouped = cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
         
-        # Plot mean performance for each type
-        for cb_type, cb_data, color, label in [
-            ('type1', type1_data, 'red', 'ClinicalBERT Type 1'),
-            ('type2', type2_data, 'blue', 'ClinicalBERT Type 2'),
-            ('type3', type3_data, 'green', 'ClinicalBERT Type 3')
-        ]:
-            if cb_data.empty:
-                continue
-                
-            # Group by k-value and compute mean across all models/heads of this type
-            grouped = cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
-            
-            # Plot line with error bars
-            ax.errorbar(grouped['k'], grouped['mean'], yerr=grouped['std'], 
-                       color=color, label=label, marker='o', linewidth=2, markersize=6)
+        # Plot main line with thicker linewidth
+        ax.plot(grouped['k'], grouped['mean'], 
+               color=color, label=label, linewidth=3, marker='o', markersize=8)
         
-        ax.set_xlabel('K (Number of Training Examples)', fontsize=10)
-        ax.set_ylabel(f'{score.upper()}', fontsize=10)
-        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=12)
-        
-        if is_x_scale_log:
-            ax.set_xscale('log')
-            ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
-            ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
-        
-        ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=8)
+        # Add thin confidence interval lines instead of overlapping shaded areas
+        ax.plot(grouped['k'], grouped['mean'] + grouped['std'], 
+               color=color, linewidth=1, alpha=0.6, linestyle='--')
+        ax.plot(grouped['k'], grouped['mean'] - grouped['std'], 
+               color=color, linewidth=1, alpha=0.6, linestyle='--')
     
-    fig.suptitle(f'ClinicalBERT Type Comparison - {score.upper()}', fontsize=16)
+    ax.set_xlabel('# of Train Examples per Class', fontsize=14)
+    ax.set_ylabel(f'Mean {score.upper()} Score Over All Tasks', fontsize=14)
+    # Remove title as requested
+    
+    if is_x_scale_log:
+        ax.set_xscale('log')
+        ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
+        ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+    
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=12, loc='lower right')
+    
+    # Improve overall aesthetics
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.tick_params(labelsize=12)
+    
     plt.tight_layout()
-    plt.subplots_adjust(top=0.92)
-    plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_type_comparison_{score}.png"), dpi=300)
+    plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_type_comparison_{score}.png"), dpi=300, bbox_inches='tight')
     plt.close('all')
     return fig
 
