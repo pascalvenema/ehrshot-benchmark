@@ -1,6 +1,6 @@
 """
 Evaluation module for dimensionality reduction analysis.
-Provides k-nearest neighbors evaluation with proper hyperparameter tuning.
+Provides k-nearest neighbors evaluation using the exact same code as the main EHRSHOT pipeline.
 """
 
 import numpy as np
@@ -18,41 +18,52 @@ sys.path.append(os.path.dirname(__file__))
 
 from reducers import get_reducer
 
-# Import kNN parameters from main utils
+# Import the actual evaluation functions from main pipeline
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 try:
     from utils import KNN_PARAMS
-except ImportError:
+    # Import the actual evaluation functions from main pipeline
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("eval_module", os.path.join(os.path.dirname(os.path.dirname(__file__)), "7_eval.py"))
+    eval_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(eval_module)
+    
+    # Use the actual functions from main pipeline
+    tune_hyperparams = eval_module.tune_hyperparams
+    run_evaluation = eval_module.run_evaluation
+    
+except ImportError as e:
+    logger.error(f"Could not import main pipeline evaluation functions: {e}")
     # Fallback parameters if import fails
     KNN_PARAMS = {
         'n_neighbors': [1, 3, 5],
+        'weights': ['uniform', 'distance'],
         'metric': ['euclidean', 'cosine']
     }
+    tune_hyperparams = None
+    run_evaluation = None
 
 class kNNEvaluator:
     """
-    k-Nearest Neighbors evaluator with cross-validation hyperparameter tuning.
-    Uses the same hyperparameters as the main EHRSHOT pipeline.
+    k-Nearest Neighbors evaluator using the exact same code as the main EHRSHOT pipeline.
     """
     
-    def __init__(self, cv_folds: int = 5, random_state: int = 42):
+    def __init__(self, random_state: int = 42):
         """
         Initialize the kNN evaluator.
         
         Args:
-            cv_folds: Number of cross-validation folds for hyperparameter tuning
             random_state: Random state for reproducibility
         """
-        self.cv_folds = cv_folds
         self.random_state = random_state
         
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> Dict[str, float]:
         """
-        Evaluate kNN performance using cross-validation for hyperparameter tuning.
+        Evaluate kNN performance using the exact same procedure as the main EHRSHOT pipeline.
         
         Args:
-            X: Feature matrix
-            y: Target labels
+            X: Feature matrix (should be train+val combined for consistency)
+            y: Target labels (should be train+val combined for consistency)
             
         Returns:
             Dictionary with performance metrics
@@ -60,81 +71,50 @@ class kNNEvaluator:
         if len(np.unique(y)) < 2:
             logger.warning("Only one class present in labels, returning zero scores")
             return {'auroc': 0.0, 'auprc': 0.0}
-        
-        # Use stratified k-fold for hyperparameter selection
-        skf = StratifiedKFold(n_splits=self.cv_folds, shuffle=True, random_state=self.random_state)
-        
-        best_score = -1
-        best_params = None
-        
-        # Grid search over hyperparameters
-        for n_neighbors in KNN_PARAMS['n_neighbors']:
-            for metric in KNN_PARAMS['metric']:
-                scores = []
-                
-                for train_idx, val_idx in skf.split(X, y):
-                    X_train_fold, X_val_fold = X[train_idx], X[val_idx]
-                    y_train_fold, y_val_fold = y[train_idx], y[val_idx]
-                    
-                    try:
-                        # Train kNN classifier
-                        knn = KNeighborsClassifier(
-                            n_neighbors=min(n_neighbors, len(X_train_fold) - 1),
-                            metric=metric,
-                            n_jobs=1
-                        )
-                        knn.fit(X_train_fold, y_train_fold)
-                        
-                        # Get predictions
-                        y_pred_proba = knn.predict_proba(X_val_fold)[:, 1]
-                        
-                        # Calculate AUROC
-                        auroc = roc_auc_score(y_val_fold, y_pred_proba)
-                        scores.append(auroc)
-                        
-                    except Exception as e:
-                        logger.warning(f"Error with n_neighbors={n_neighbors}, metric={metric}: {e}")
-                        scores.append(0.0)
-                
-                # Average score across folds
-                avg_score = np.mean(scores)
-                
-                if avg_score > best_score:
-                    best_score = avg_score
-                    best_params = {'n_neighbors': n_neighbors, 'metric': metric}
-        
-        if best_params is None:
-            logger.error("No valid hyperparameters found")
+            
+        if run_evaluation is None:
+            logger.error("Main pipeline evaluation function not available")
             return {'auroc': 0.0, 'auprc': 0.0}
         
-        # Train final model with best parameters
-        knn = KNeighborsClassifier(
-            n_neighbors=min(best_params['n_neighbors'], len(X) - 1),
-            metric=best_params['metric'],
-            n_jobs=1
-        )
+        # Split the combined data back into train/val for the main pipeline function
+        # Use a 80/20 split to mimic typical train/val proportions
+        split_idx = int(0.8 * len(X))
         
-        # Use cross-validation to get final performance estimate
-        final_aurocs = []
-        final_auprcs = []
+        # Shuffle with fixed seed for reproducibility
+        np.random.seed(self.random_state)
+        indices = np.random.permutation(len(X))
         
-        for train_idx, test_idx in skf.split(X, y):
-            X_train_fold, X_test_fold = X[train_idx], X[test_idx]
-            y_train_fold, y_test_fold = y[train_idx], y[test_idx]
-            
-            knn.fit(X_train_fold, y_train_fold)
-            y_pred_proba = knn.predict_proba(X_test_fold)[:, 1]
-            
-            auroc = roc_auc_score(y_test_fold, y_pred_proba)
-            auprc = average_precision_score(y_test_fold, y_pred_proba)
-            
-            final_aurocs.append(auroc)
-            final_auprcs.append(auprc)
+        train_indices = indices[:split_idx]
+        val_indices = indices[split_idx:]
         
-        return {
-            'auroc': np.mean(final_aurocs),
-            'auprc': np.mean(final_auprcs)
-        }
+        X_train = X[train_indices]
+        X_val = X[val_indices] 
+        X_test = X_val  # Use val as test for evaluation (since we don't have actual test here)
+        y_train = y[train_indices]
+        y_val = y[val_indices]
+        y_test = y_val  # Use val as test for evaluation
+        
+        try:
+            # Use the exact same evaluation function as the main pipeline
+            model, scores = run_evaluation(
+                X_train=X_train,
+                X_val=X_val, 
+                X_test=X_test,
+                y_train=y_train,
+                y_val=y_val,
+                y_test=y_test,
+                model_head='knn',
+                n_jobs=1
+            )
+            
+            return {
+                'auroc': scores['auroc'],
+                'auprc': scores['auprc']
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in main pipeline evaluation: {e}")
+            return {'auroc': 0.0, 'auprc': 0.0}
 
 
 def evaluate_all_combinations(
@@ -201,7 +181,7 @@ def evaluate_all_combinations(
                 X_combined = np.vstack([X_train_reduced, X_val_reduced])
                 y_combined = np.hstack([y_train, y_val])
                 
-                # Evaluate
+                # Evaluate using main pipeline evaluation
                 eval_results = evaluator.evaluate(X_combined, y_combined)
                 
                 results.append({

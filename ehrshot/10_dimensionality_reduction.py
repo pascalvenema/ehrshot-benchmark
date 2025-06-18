@@ -54,13 +54,21 @@ def run_dimensionality_analysis(
     """
     # Default parameters
     if tasks is None:
-        tasks = ['guo_icu', 'guo_readmission', 'new_hypertension', 'lab_hyperkalemia']
+        # All 14 tasks (excluding chexpert)
+        tasks = [
+            # Operational outcomes
+            'guo_los', 'guo_readmission', 'guo_icu',
+            # Lab values  
+            'lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia',
+            # New diagnoses
+            'new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi'
+        ]
     
     if models is None:
         models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
     
     if dimensions is None:
-        dimensions = [2, 5, 10, 25, 50]
+        dimensions = [2, 5, 10, 25, 50, 100, 200, 400]
     
     if methods is None:
         methods = ['pca', 'umap']  # Skip t-SNE for now due to transform issues
@@ -227,7 +235,14 @@ def main():
     parser.add_argument(
         "--tasks", 
         nargs='+', 
-        default=['guo_icu', 'guo_readmission', 'new_hypertension', 'lab_hyperkalemia'],
+        default=[
+            # Operational outcomes
+            'guo_los', 'guo_readmission', 'guo_icu',
+            # Lab values  
+            'lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia',
+            # New diagnoses
+            'new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi'
+        ],
         help="List of tasks to analyze"
     )
     parser.add_argument(
@@ -240,7 +255,7 @@ def main():
         "--dimensions", 
         nargs='+', 
         type=int,
-        default=[2, 5, 10, 25, 50],
+        default=[2, 5, 10, 25, 50, 100, 200, 400],
         help="List of target dimensions to test"
     )
     parser.add_argument(

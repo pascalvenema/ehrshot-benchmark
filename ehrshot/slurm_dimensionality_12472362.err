@@ -1,0 +1,363 @@
+2025-06-18 13:30:53.336 | INFO     | __main__:main:282 - Starting EHRSHOT dimensionality reduction analysis
+2025-06-18 13:30:53.338 | INFO     | __main__:main:283 - Arguments: {'path_to_database': '../EHRSHOT_ASSETS/femr/extract', 'path_to_labels_dir': '../EHRSHOT_ASSETS/benchmark', 'path_to_features_dir': '../EHRSHOT_ASSETS/features', 'path_to_split_csv': '../EHRSHOT_ASSETS/splits/person_id_map.csv', 'tasks': ['guo_los', 'guo_readmission', 'guo_icu', 'lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia', 'new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi'], 'models': ['clmbr', 'clinicalbert_type3_clinicalbert_pool'], 'dimensions': [2, 5, 10, 25, 50, 100, 200, 400], 'methods': ['pca', 'umap', 'tsne'], 'output_dir': '../EHRSHOT_ASSETS/dimensionality_analysis'}
+2025-06-18 13:30:53.338 | INFO     | __main__:run_dimensionality_analysis:85 - Starting dimensionality analysis for 14 tasks, 2 models
+2025-06-18 13:30:53.338 | INFO     | __main__:run_dimensionality_analysis:86 - Testing dimensions: [2, 5, 10, 25, 50, 100, 200, 400]
+2025-06-18 13:30:53.338 | INFO     | __main__:run_dimensionality_analysis:87 - Using methods: ['pca', 'umap', 'tsne']
+2025-06-18 13:30:53.339 | INFO     | __main__:run_dimensionality_analysis:90 - 
+==================================================
+2025-06-18 13:30:53.339 | INFO     | __main__:run_dimensionality_analysis:91 - Processing task: guo_los
+2025-06-18 13:30:53.339 | INFO     | __main__:run_dimensionality_analysis:92 - ==================================================
+2025-06-18 13:30:53.365 | INFO     | __main__:run_dimensionality_analysis:98 - Loaded labeled patients for guo_los
+2025-06-18 13:31:18.187 | INFO     | __main__:run_dimensionality_analysis:115 - 
+Processing model: clmbr
+2025-06-18 13:31:18.194 | INFO     | __main__:run_dimensionality_analysis:134 - Data shapes - Train: (2569, 768), Val: (2231, 768), Test: (2195, 768)
+2025-06-18 13:31:18.196 | INFO     | __main__:run_dimensionality_analysis:135 - Label distribution - Train: 0.265, Val: 0.239, Test: 0.251
+2025-06-18 13:31:18.198 | INFO     | __main__:run_dimensionality_analysis:142 - 
+  Testing method: pca
+2025-06-18 13:31:18.198 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 2 dimensions...
+2025-06-18 13:31:18.198 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-18 13:31:18.307 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 2)
+2025-06-18 13:31:18.308 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:18.308 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 2), Y = (3840,)
+2025-06-18 13:31:18.308 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 2), Y = (960,)
+2025-06-18 13:31:18.309 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 2), Y = (960,)
+2025-06-18 13:31:18.309 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:18.309 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:18.309 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:18.309 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:18.815 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:18.823 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:19.313 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:19.314 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.5800034647757752
+2025-06-18 13:31:19.315 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.5800034647757752
+2025-06-18 13:31:19.316 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:31:19.316 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.2597849777693898
+2025-06-18 13:31:19.316 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.2597849777693898
+2025-06-18 13:31:19.318 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:19.318 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.29677538518236213
+2025-06-18 13:31:19.319 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.29677538518236213
+2025-06-18 13:31:19.319 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.580, AUPRC=0.297
+2025-06-18 13:31:19.319 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 5 dimensions...
+2025-06-18 13:31:19.319 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-18 13:31:19.439 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 5)
+2025-06-18 13:31:19.440 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:19.440 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 5), Y = (3840,)
+2025-06-18 13:31:19.440 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 5), Y = (960,)
+2025-06-18 13:31:19.440 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 5), Y = (960,)
+2025-06-18 13:31:19.441 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:19.441 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:19.441 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:19.441 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:19.882 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'uniform'}
+2025-06-18 13:31:19.882 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:20.351 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 0.8496196221523189
+2025-06-18 13:31:20.351 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.6644842561783524
+2025-06-18 13:31:20.351 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.6644842561783524
+2025-06-18 13:31:20.352 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.13131250000000003
+2025-06-18 13:31:20.352 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.18658333333333338
+2025-06-18 13:31:20.352 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.18658333333333338
+2025-06-18 13:31:20.355 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 0.5882772548208838
+2025-06-18 13:31:20.355 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.34708468527516523
+2025-06-18 13:31:20.355 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.34708468527516523
+2025-06-18 13:31:20.355 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.664, AUPRC=0.347
+2025-06-18 13:31:20.355 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 10 dimensions...
+2025-06-18 13:31:20.355 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-18 13:31:20.460 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 10)
+2025-06-18 13:31:20.461 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:20.461 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 10), Y = (3840,)
+2025-06-18 13:31:20.461 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 10), Y = (960,)
+2025-06-18 13:31:20.461 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 10), Y = (960,)
+2025-06-18 13:31:20.461 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:20.462 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:20.462 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:20.462 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:20.967 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:20.967 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:21.442 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:21.442 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7102163095358992
+2025-06-18 13:31:21.442 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7102163095358992
+2025-06-18 13:31:21.443 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:31:21.443 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.17558622067857416
+2025-06-18 13:31:21.444 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.17558622067857416
+2025-06-18 13:31:21.446 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:21.446 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.42493699170147947
+2025-06-18 13:31:21.446 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.42493699170147947
+2025-06-18 13:31:21.446 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.710, AUPRC=0.425
+2025-06-18 13:31:21.446 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 25 dimensions...
+2025-06-18 13:31:21.447 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-18 13:31:21.760 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 25)
+2025-06-18 13:31:21.770 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:21.770 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 25), Y = (3840,)
+2025-06-18 13:31:21.770 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 25), Y = (960,)
+2025-06-18 13:31:21.770 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 25), Y = (960,)
+2025-06-18 13:31:21.770 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:21.771 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:21.771 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:21.771 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:22.361 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:22.362 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:22.835 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:22.835 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7430151912496491
+2025-06-18 13:31:22.836 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7430151912496491
+2025-06-18 13:31:22.837 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:31:22.837 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.16576383310284498
+2025-06-18 13:31:22.837 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.16576383310284498
+2025-06-18 13:31:22.839 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:22.839 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.4652976368152423
+2025-06-18 13:31:22.839 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.4652976368152423
+2025-06-18 13:31:22.840 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.743, AUPRC=0.465
+2025-06-18 13:31:22.840 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 50 dimensions...
+2025-06-18 13:31:22.840 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-18 13:31:24.112 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 50)
+2025-06-18 13:31:24.113 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:24.113 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 50), Y = (3840,)
+2025-06-18 13:31:24.114 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 50), Y = (960,)
+2025-06-18 13:31:24.114 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 50), Y = (960,)
+2025-06-18 13:31:24.114 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:24.114 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:24.114 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:24.115 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:24.637 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:24.637 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:25.107 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:25.107 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7414470815237845
+2025-06-18 13:31:25.108 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7414470815237845
+2025-06-18 13:31:25.109 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:31:25.109 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.16518894654719096
+2025-06-18 13:31:25.109 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.16518894654719096
+2025-06-18 13:31:25.111 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:25.111 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.4837555041515348
+2025-06-18 13:31:25.111 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.4837555041515348
+2025-06-18 13:31:25.112 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.741, AUPRC=0.484
+2025-06-18 13:31:25.112 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 100 dimensions...
+2025-06-18 13:31:25.112 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 100 dimensions
+2025-06-18 13:31:26.103 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 100)
+2025-06-18 13:31:26.104 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:26.105 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 100), Y = (3840,)
+2025-06-18 13:31:26.105 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 100), Y = (960,)
+2025-06-18 13:31:26.105 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 100), Y = (960,)
+2025-06-18 13:31:26.105 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:26.105 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:26.105 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:26.106 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:26.676 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:26.676 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:26.831 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:26.832 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7484333837119697
+2025-06-18 13:31:26.832 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7484333837119697
+2025-06-18 13:31:26.833 | INFO     | eval_module:run_evaluation:162 - Train brier score: 9.816672326231173e-16
+2025-06-18 13:31:26.833 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.16095780002552626
+2025-06-18 13:31:26.833 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.16095780002552626
+2025-06-18 13:31:26.835 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:26.836 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.5143318355082475
+2025-06-18 13:31:26.836 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.5143318355082475
+2025-06-18 13:31:26.836 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.748, AUPRC=0.514
+2025-06-18 13:31:26.836 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 200 dimensions...
+2025-06-18 13:31:26.836 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 200 dimensions
+2025-06-18 13:31:28.072 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 200)
+2025-06-18 13:31:28.073 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:28.074 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 200), Y = (3840,)
+2025-06-18 13:31:28.074 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 200), Y = (960,)
+2025-06-18 13:31:28.074 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 200), Y = (960,)
+2025-06-18 13:31:28.074 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:28.074 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:28.075 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:28.084 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:28.719 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:28.719 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:28.832 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:28.833 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7549029564095364
+2025-06-18 13:31:28.833 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7549029564095364
+2025-06-18 13:31:28.834 | INFO     | eval_module:run_evaluation:162 - Train brier score: 1.0030841341828543e-15
+2025-06-18 13:31:28.834 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.16043671089090447
+2025-06-18 13:31:28.834 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.16043671089090447
+2025-06-18 13:31:28.836 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:28.837 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.5272470429908949
+2025-06-18 13:31:28.837 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.5272470429908949
+2025-06-18 13:31:28.837 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.755, AUPRC=0.527
+2025-06-18 13:31:28.837 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 400 dimensions...
+2025-06-18 13:31:28.837 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 400 dimensions
+2025-06-18 13:31:29.731 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 400)
+2025-06-18 13:31:29.734 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:29.735 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 400), Y = (3840,)
+2025-06-18 13:31:29.735 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 400), Y = (960,)
+2025-06-18 13:31:29.735 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 400), Y = (960,)
+2025-06-18 13:31:29.735 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:29.736 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:29.736 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:29.746 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:30.418 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:31:30.419 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:30.932 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:31:30.933 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7588306979133687
+2025-06-18 13:31:30.933 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7588306979133687
+2025-06-18 13:31:30.934 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:31:30.934 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.15854884631318159
+2025-06-18 13:31:30.934 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.15854884631318159
+2025-06-18 13:31:30.936 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:31:30.936 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.5223105564585917
+2025-06-18 13:31:30.936 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.5223105564585917
+2025-06-18 13:31:30.937 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.759, AUPRC=0.522
+2025-06-18 13:31:30.937 | INFO     | __main__:run_dimensionality_analysis:142 - 
+  Testing method: umap
+2025-06-18 13:31:30.937 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 2 dimensions...
+2025-06-18 13:31:30.937 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-18 13:31:30.937 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-18 13:31:55.466 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 2)
+2025-06-18 13:31:55.468 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:31:55.468 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 2), Y = (3840,)
+2025-06-18 13:31:55.468 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 2), Y = (960,)
+2025-06-18 13:31:55.469 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 2), Y = (960,)
+2025-06-18 13:31:55.469 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:31:55.469 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:31:55.469 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:31:55.469 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:31:55.795 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'uniform'}
+2025-06-18 13:31:55.796 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:31:55.813 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 0.8650022885214304
+2025-06-18 13:31:55.813 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7052551090508307
+2025-06-18 13:31:55.813 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7052551090508307
+2025-06-18 13:31:55.814 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.12390625000000002
+2025-06-18 13:31:55.814 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.183125
+2025-06-18 13:31:55.814 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.183125
+2025-06-18 13:31:55.816 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 0.6361671425554489
+2025-06-18 13:31:55.817 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.3753470658263063
+2025-06-18 13:31:55.817 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.3753470658263063
+2025-06-18 13:31:55.817 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.705, AUPRC=0.375
+2025-06-18 13:31:55.817 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 5 dimensions...
+2025-06-18 13:31:55.820 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-18 13:31:55.821 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-18 13:32:03.776 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 5)
+2025-06-18 13:32:03.777 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:32:03.777 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 5), Y = (3840,)
+2025-06-18 13:32:03.778 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 5), Y = (960,)
+2025-06-18 13:32:03.778 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 5), Y = (960,)
+2025-06-18 13:32:03.778 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:32:03.778 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:32:03.778 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:32:03.779 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:32:04.114 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:32:04.115 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:32:04.140 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:32:04.141 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7100102151147857
+2025-06-18 13:32:04.141 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7100102151147857
+2025-06-18 13:32:04.142 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:32:04.142 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.18120024691233136
+2025-06-18 13:32:04.142 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.18120024691233136
+2025-06-18 13:32:04.144 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:32:04.144 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.4181222607164966
+2025-06-18 13:32:04.145 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.4181222607164966
+2025-06-18 13:32:04.145 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.710, AUPRC=0.418
+2025-06-18 13:32:04.145 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 10 dimensions...
+2025-06-18 13:32:04.147 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-18 13:32:04.148 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-18 13:32:13.228 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 10)
+2025-06-18 13:32:13.229 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:32:13.230 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 10), Y = (3840,)
+2025-06-18 13:32:13.230 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 10), Y = (960,)
+2025-06-18 13:32:13.230 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 10), Y = (960,)
+2025-06-18 13:32:13.230 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:32:13.230 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:32:13.231 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:32:13.231 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:32:13.590 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'uniform'}
+2025-06-18 13:32:13.590 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:32:13.975 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 0.8719927620179357
+2025-06-18 13:32:13.975 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7132479883392374
+2025-06-18 13:32:13.975 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7132479883392374
+2025-06-18 13:32:13.976 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.12133333333333335
+2025-06-18 13:32:13.976 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.17558333333333334
+2025-06-18 13:32:13.977 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.17558333333333334
+2025-06-18 13:32:13.979 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 0.645702642499945
+2025-06-18 13:32:13.979 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.3955080485029297
+2025-06-18 13:32:13.979 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.3955080485029297
+2025-06-18 13:32:13.979 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.713, AUPRC=0.396
+2025-06-18 13:32:13.979 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 25 dimensions...
+2025-06-18 13:32:13.981 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-18 13:32:13.982 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-18 13:32:27.008 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 25)
+2025-06-18 13:32:27.010 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:32:27.011 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 25), Y = (3840,)
+2025-06-18 13:32:27.011 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 25), Y = (960,)
+2025-06-18 13:32:27.011 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 25), Y = (960,)
+2025-06-18 13:32:27.011 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:32:27.011 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:32:27.011 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:32:27.012 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:32:27.348 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:32:27.349 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:32:27.445 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:32:27.446 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7335318610027539
+2025-06-18 13:32:27.446 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7335318610027539
+2025-06-18 13:32:27.447 | INFO     | eval_module:run_evaluation:162 - Train brier score: 0.0
+2025-06-18 13:32:27.447 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.1723731685088338
+2025-06-18 13:32:27.447 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.1723731685088338
+2025-06-18 13:32:27.449 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:32:27.449 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.45116603085308477
+2025-06-18 13:32:27.450 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.45116603085308477
+2025-06-18 13:32:27.450 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.734, AUPRC=0.451
+2025-06-18 13:32:27.450 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 50 dimensions...
+2025-06-18 13:32:27.453 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-18 13:32:27.453 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-18 13:32:44.138 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 50)
+2025-06-18 13:32:44.140 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:32:44.140 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 50), Y = (3840,)
+2025-06-18 13:32:44.141 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 50), Y = (960,)
+2025-06-18 13:32:44.141 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 50), Y = (960,)
+2025-06-18 13:32:44.141 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:32:44.141 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:32:44.141 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:32:44.142 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:32:44.492 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:32:44.493 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:32:44.561 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:32:44.562 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7353747632901033
+2025-06-18 13:32:44.562 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7353747632901033
+2025-06-18 13:32:44.563 | INFO     | eval_module:run_evaluation:162 - Train brier score: 1.3141840379359296e-11
+2025-06-18 13:32:44.563 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.17290783390228512
+2025-06-18 13:32:44.563 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.17290783390228512
+2025-06-18 13:32:44.565 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:32:44.566 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.4401973569545289
+2025-06-18 13:32:44.566 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.4401973569545289
+2025-06-18 13:32:44.566 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.735, AUPRC=0.440
+2025-06-18 13:32:44.566 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 100 dimensions...
+2025-06-18 13:32:44.569 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 100 dimensions
+2025-06-18 13:32:44.569 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-18 13:33:02.896 | INFO     | __main__:run_dimensionality_analysis:158 -     Reduced shape: (4800, 100)
+2025-06-18 13:33:02.898 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-06-18 13:33:02.898 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (3840, 100), Y = (3840,)
+2025-06-18 13:33:02.898 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (960, 100), Y = (960,)
+2025-06-18 13:33:02.898 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (960, 100), Y = (960,)
+2025-06-18 13:33:02.898 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.25677083333333334
+2025-06-18 13:33:02.899 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23854166666666668
+2025-06-18 13:33:02.899 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.23854166666666668
+2025-06-18 13:33:02.899 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-06-18 13:33:03.297 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-06-18 13:33:03.297 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-06-18 13:33:03.369 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-06-18 13:33:03.370 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7172384542321042
+2025-06-18 13:33:03.370 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7172384542321042
+2025-06-18 13:33:03.371 | INFO     | eval_module:run_evaluation:162 - Train brier score: 8.416160947326211e-09
+2025-06-18 13:33:03.371 | INFO     | eval_module:run_evaluation:163 - Val brier score:   0.18087309951953714
+2025-06-18 13:33:03.371 | INFO     | eval_module:run_evaluation:164 - Test brier score:  0.18087309951953714
+2025-06-18 13:33:03.373 | INFO     | eval_module:run_evaluation:170 - Train AUPRC: 1.0
+2025-06-18 13:33:03.374 | INFO     | eval_module:run_evaluation:171 - Val AUPRC:   0.42925522583640063
+2025-06-18 13:33:03.374 | INFO     | eval_module:run_evaluation:172 - Test AUPRC:  0.42925522583640063
+2025-06-18 13:33:03.374 | INFO     | __main__:run_dimensionality_analysis:174 -     Results: AUROC=0.717, AUPRC=0.429
+2025-06-18 13:33:03.374 | INFO     | __main__:run_dimensionality_analysis:149 -     Reducing to 200 dimensions...
+2025-06-18 13:33:03.377 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 200 dimensions
+2025-06-18 13:33:03.377 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(

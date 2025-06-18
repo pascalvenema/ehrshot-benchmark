@@ -1,0 +1,65 @@
+Job ID: 12461615
+Job Name: dim_reduction
+Node: tcn495
+Start Time: Tue Jun 17 17:44:27 CEST 2025
+Working Directory: /gpfs/home6/pvenema/ehrshot-benchmark/ehrshot
+Python version: Python 3.10.16
+Conda environment: EHRSHOT_ENV
+Available memory:                total        used        free      shared  buff/cache   available
+Mem:           251Gi        36Gi       215Gi       305Mi       5.2Gi       214Gi
+Swap:             0B          0B          0B
+Available CPUs: 16
+Starting dimensionality reduction analysis...
+🧬 Starting EHRSHOT Dimensionality Reduction Analysis
+==================================================
+Database: ../EHRSHOT_ASSETS/femr/extract
+Labels:   ../EHRSHOT_ASSETS/benchmark
+Features: ../EHRSHOT_ASSETS/features
+Splits:   ../EHRSHOT_ASSETS/splits/person_id_map.csv
+Output:   ../EHRSHOT_ASSETS/dimensionality_analysis
+
+🚀 Running dimensionality reduction analysis...
+Loading baseline kNN results...
+Comparison plot saved to ../EHRSHOT_ASSETS/dimensionality_analysis/dimensionality_analysis_comparison.png
+Combined plot saved to ../EHRSHOT_ASSETS/dimensionality_analysis/dimensionality_analysis_combined.png
+Best dimensions heatmap saved to ../EHRSHOT_ASSETS/dimensionality_analysis/best_dimensions_heatmap.png
+All plots saved to ../EHRSHOT_ASSETS/dimensionality_analysis
+
+✅ Dimensionality reduction analysis completed!
+📊 Results saved to: ../EHRSHOT_ASSETS/dimensionality_analysis
+
+Generated files:
+  - dimensionality_results.csv (raw results)
+  - dimensionality_summary.csv (summary table)
+  - dimensionality_analysis_comparison.png (separate model plots)
+  - dimensionality_analysis_combined.png (combined comparison)
+  - best_dimensions_heatmap.png (optimal dimensions heatmap)
+  - dimensionality_analysis.log (execution log)
+Dimensionality reduction analysis completed successfully!
+Generated files:
+total 4443
+drwxr-x---  2 pvenema pvenema   4096 Jun 17 21:49 .
+drwxr-xr-x 11 pvenema pvenema   4096 Jun 17 16:27 ..
+-rw-r-----  1 pvenema pvenema 224701 Jun 17 21:49 best_dimensions_heatmap.png
+-rw-r-----  1 pvenema pvenema 111243 Jun 17 21:49 dimensionality_analysis.log
+-rw-r-----  1 pvenema pvenema 380553 Jun 17 21:49 dimensionality_analysis_combined.png
+-rw-r-----  1 pvenema pvenema 452966 Jun 17 21:49 dimensionality_analysis_comparison.png
+-rw-r-----  1 pvenema pvenema 352211 Jun 17 16:40 dimensionality_analysis_overview.png
+-rw-r-----  1 pvenema pvenema  10982 Jun 17 21:49 dimensionality_results.csv
+-rw-r-----  1 pvenema pvenema   3089 Jun 17 21:49 dimensionality_summary.csv
+End Time: Tue Jun 17 21:49:11 CEST 2025
+
+JOB STATISTICS
+==============
+Job ID: 12461615
+Cluster: snellius
+User/Group: pvenema/pvenema
+State: RUNNING
+Nodes: 1
+Cores per node: 16
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 2-17:18:56 core-walltime
+Job Wall-clock time: 04:04:56
+Memory Utilized: 0.00 MB
+Memory Efficiency: 0.00% of 32.00 GB (32.00 GB/node)
+WARNING: Efficiency statistics can only be obtained after the job has ended as seff tool is based on the accounting database data.

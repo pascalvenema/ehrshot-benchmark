@@ -6,11 +6,11 @@
 set -e
 
 # Default paths - adjust these as needed
-DEFAULT_DATABASE_PATH="../../EHRSHOT_ASSETS/femr/extract"
-DEFAULT_LABELS_PATH="../../EHRSHOT_ASSETS/benchmark"
-DEFAULT_FEATURES_PATH="../../EHRSHOT_ASSETS/custom_hf_features"
-DEFAULT_SPLITS_PATH="../../EHRSHOT_ASSETS/splits/person_id_map.csv"
-DEFAULT_OUTPUT_PATH="../../EHRSHOT_ASSETS/dimensionality_analysis"
+DEFAULT_DATABASE_PATH="../EHRSHOT_ASSETS/femr/extract"
+DEFAULT_LABELS_PATH="../EHRSHOT_ASSETS/benchmark"
+DEFAULT_FEATURES_PATH="../EHRSHOT_ASSETS/features"
+DEFAULT_SPLITS_PATH="../EHRSHOT_ASSETS/splits/person_id_map.csv"
+DEFAULT_OUTPUT_PATH="../EHRSHOT_ASSETS/dimensionality_analysis"
 
 # Allow overriding via environment variables
 DATABASE_PATH=${EHRSHOT_DATABASE_PATH:-$DEFAULT_DATABASE_PATH}
@@ -60,10 +60,10 @@ python 10_dimensionality_reduction.py \
     --path_to_features_dir "$FEATURES_PATH" \
     --path_to_split_csv "$SPLITS_PATH" \
     --output_dir "$OUTPUT_PATH" \
-    --tasks guo_icu guo_readmission new_hypertension lab_hyperkalemia \
+    --tasks guo_los guo_readmission guo_icu lab_thrombocytopenia lab_hyperkalemia lab_hypoglycemia lab_hyponatremia lab_anemia new_hypertension new_hyperlipidemia new_pancan new_celiac new_lupus new_acutemi \
     --models clmbr clinicalbert_type3_clinicalbert_pool \
-    --dimensions 2 5 10 25 50 \
-    --methods pca umap
+    --dimensions 2 5 10 25 50 100 200 400 \
+    --methods pca umap tsne
 
 echo ""
 echo "✅ Dimensionality reduction analysis completed!"

@@ -1,0 +1,540 @@
+2025-06-17 17:44:39.162 | INFO     | __main__:main:267 - Starting EHRSHOT dimensionality reduction analysis
+2025-06-17 17:44:39.164 | INFO     | __main__:main:268 - Arguments: {'path_to_database': '../EHRSHOT_ASSETS/femr/extract', 'path_to_labels_dir': '../EHRSHOT_ASSETS/benchmark', 'path_to_features_dir': '../EHRSHOT_ASSETS/features', 'path_to_split_csv': '../EHRSHOT_ASSETS/splits/person_id_map.csv', 'tasks': ['guo_icu', 'guo_readmission', 'new_hypertension', 'lab_hyperkalemia'], 'models': ['clmbr', 'clinicalbert_type3_clinicalbert_pool'], 'dimensions': [2, 5, 10, 25, 50], 'methods': ['pca', 'umap'], 'output_dir': '../EHRSHOT_ASSETS/dimensionality_analysis'}
+2025-06-17 17:44:39.164 | INFO     | __main__:run_dimensionality_analysis:77 - Starting dimensionality analysis for 4 tasks, 2 models
+2025-06-17 17:44:39.164 | INFO     | __main__:run_dimensionality_analysis:78 - Testing dimensions: [2, 5, 10, 25, 50]
+2025-06-17 17:44:39.164 | INFO     | __main__:run_dimensionality_analysis:79 - Using methods: ['pca', 'umap']
+2025-06-17 17:44:39.164 | INFO     | __main__:run_dimensionality_analysis:82 - 
+==================================================
+2025-06-17 17:44:39.165 | INFO     | __main__:run_dimensionality_analysis:83 - Processing task: guo_icu
+2025-06-17 17:44:39.165 | INFO     | __main__:run_dimensionality_analysis:84 - ==================================================
+2025-06-17 17:44:39.190 | INFO     | __main__:run_dimensionality_analysis:90 - Loaded labeled patients for guo_icu
+2025-06-17 17:45:02.225 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clmbr
+2025-06-17 17:45:02.229 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (2402, 768), Val: (2052, 768), Test: (2037, 768)
+2025-06-17 17:45:02.229 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.047, Val: 0.045, Test: 0.042
+2025-06-17 17:45:02.231 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:45:02.231 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:45:02.231 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:45:02.326 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 2)
+2025-06-17 17:45:03.166 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.559, AUPRC=0.062
+2025-06-17 17:45:03.166 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:45:03.167 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 17:45:03.268 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 5)
+2025-06-17 17:45:04.328 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.636, AUPRC=0.093
+2025-06-17 17:45:04.329 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:45:04.329 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 17:45:04.435 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 10)
+2025-06-17 17:45:05.626 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.650, AUPRC=0.137
+2025-06-17 17:45:05.627 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:45:05.627 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 17:45:05.795 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 25)
+2025-06-17 17:45:07.223 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.708, AUPRC=0.209
+2025-06-17 17:45:07.224 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:45:07.224 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 17:45:08.803 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 50)
+2025-06-17 17:45:10.586 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.726, AUPRC=0.248
+2025-06-17 17:45:10.587 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 17:45:10.587 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:45:10.587 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 17:45:10.587 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:45:34.405 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 2)
+2025-06-17 17:45:35.129 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.696, AUPRC=0.189
+2025-06-17 17:45:35.129 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:45:35.131 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 17:45:35.131 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:45:42.438 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 5)
+2025-06-17 17:45:43.435 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.684, AUPRC=0.159
+2025-06-17 17:45:43.435 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:45:43.438 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 17:45:43.438 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:45:51.793 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 10)
+2025-06-17 17:45:52.849 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.688, AUPRC=0.156
+2025-06-17 17:45:52.849 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:45:52.851 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 17:45:52.851 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:46:04.983 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 25)
+2025-06-17 17:46:06.431 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.703, AUPRC=0.184
+2025-06-17 17:46:06.432 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:46:06.434 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 17:46:06.434 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:46:22.210 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 50)
+2025-06-17 17:46:23.582 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.701, AUPRC=0.172
+2025-06-17 17:46:23.582 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clinicalbert_type3_clinicalbert_pool
+2025-06-17 17:46:23.586 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (2402, 768), Val: (2052, 768), Test: (2037, 768)
+2025-06-17 17:46:23.587 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.047, Val: 0.045, Test: 0.042
+2025-06-17 17:46:23.589 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:46:23.589 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:46:23.591 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:46:23.667 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 2)
+2025-06-17 17:46:24.431 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.545, AUPRC=0.053
+2025-06-17 17:46:24.431 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:46:24.431 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 17:46:24.492 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 5)
+2025-06-17 17:46:25.347 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.581, AUPRC=0.065
+2025-06-17 17:46:25.348 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:46:25.348 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 17:46:25.406 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 10)
+2025-06-17 17:46:26.751 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.617, AUPRC=0.085
+2025-06-17 17:46:26.751 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:46:26.751 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 17:46:27.263 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 25)
+2025-06-17 17:46:28.827 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.618, AUPRC=0.090
+2025-06-17 17:46:28.827 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:46:28.827 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 17:46:29.139 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 50)
+2025-06-17 17:46:30.800 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.622, AUPRC=0.094
+2025-06-17 17:46:30.801 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 17:46:30.801 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:46:30.801 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 17:46:30.801 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:46:37.273 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 2)
+2025-06-17 17:46:37.973 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.586, AUPRC=0.096
+2025-06-17 17:46:37.974 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:46:37.976 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 17:46:37.976 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:46:45.354 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 5)
+2025-06-17 17:46:46.126 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.612, AUPRC=0.097
+2025-06-17 17:46:46.127 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:46:46.129 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 17:46:46.129 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:46:54.578 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 10)
+2025-06-17 17:46:55.420 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.624, AUPRC=0.105
+2025-06-17 17:46:55.420 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:46:55.422 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 17:46:55.422 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:47:07.805 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 25)
+2025-06-17 17:47:08.850 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.620, AUPRC=0.102
+2025-06-17 17:47:08.851 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:47:08.853 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 17:47:08.854 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:47:24.464 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4454, 50)
+2025-06-17 17:47:25.950 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.608, AUPRC=0.097
+2025-06-17 17:47:25.951 | INFO     | __main__:run_dimensionality_analysis:82 - 
+==================================================
+2025-06-17 17:47:25.951 | INFO     | __main__:run_dimensionality_analysis:83 - Processing task: guo_readmission
+2025-06-17 17:47:25.951 | INFO     | __main__:run_dimensionality_analysis:84 - ==================================================
+2025-06-17 17:47:25.981 | INFO     | __main__:run_dimensionality_analysis:90 - Loaded labeled patients for guo_readmission
+2025-06-17 17:47:49.486 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clmbr
+2025-06-17 17:47:49.490 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (2608, 768), Val: (2206, 768), Test: (2189, 768)
+2025-06-17 17:47:49.490 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.142, Val: 0.127, Test: 0.119
+2025-06-17 17:47:49.492 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:47:49.492 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:47:49.495 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:47:49.578 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 2)
+2025-06-17 17:47:50.561 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.601, AUPRC=0.181
+2025-06-17 17:47:50.562 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:47:50.562 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 17:47:50.658 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 5)
+2025-06-17 17:47:51.733 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.704, AUPRC=0.323
+2025-06-17 17:47:51.733 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:47:51.733 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 17:47:51.821 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 10)
+2025-06-17 17:47:53.283 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.717, AUPRC=0.347
+2025-06-17 17:47:53.283 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:47:53.284 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 17:47:53.448 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 25)
+2025-06-17 17:47:55.515 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.728, AUPRC=0.381
+2025-06-17 17:47:55.515 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:47:55.515 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 17:47:57.107 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 50)
+2025-06-17 17:47:58.754 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.734, AUPRC=0.383
+2025-06-17 17:47:58.755 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 17:47:58.755 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:47:58.755 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 17:47:58.755 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:48:05.774 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 2)
+2025-06-17 17:48:06.597 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.715, AUPRC=0.365
+2025-06-17 17:48:06.598 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:48:06.600 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 17:48:06.600 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:48:14.594 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 5)
+2025-06-17 17:48:15.489 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.722, AUPRC=0.378
+2025-06-17 17:48:15.489 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:48:15.492 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 17:48:15.492 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:48:24.629 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 10)
+2025-06-17 17:48:25.639 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.713, AUPRC=0.378
+2025-06-17 17:48:25.639 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:48:25.641 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 17:48:25.642 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:48:38.814 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 25)
+2025-06-17 17:48:40.341 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.719, AUPRC=0.369
+2025-06-17 17:48:40.341 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:48:40.344 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 17:48:40.344 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:48:57.421 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 50)
+2025-06-17 17:48:59.250 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.717, AUPRC=0.375
+2025-06-17 17:48:59.251 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clinicalbert_type3_clinicalbert_pool
+2025-06-17 17:48:59.257 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (2608, 768), Val: (2206, 768), Test: (2189, 768)
+2025-06-17 17:48:59.257 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.142, Val: 0.127, Test: 0.119
+2025-06-17 17:48:59.259 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:48:59.260 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:48:59.262 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:48:59.311 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 2)
+2025-06-17 17:49:00.163 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.639, AUPRC=0.237
+2025-06-17 17:49:00.163 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:49:00.164 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 17:49:00.230 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 5)
+2025-06-17 17:49:01.202 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.700, AUPRC=0.309
+2025-06-17 17:49:01.202 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:49:01.203 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 17:49:01.257 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 10)
+2025-06-17 17:49:02.674 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.709, AUPRC=0.331
+2025-06-17 17:49:02.674 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:49:02.675 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 17:49:02.779 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 25)
+2025-06-17 17:49:04.644 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.721, AUPRC=0.368
+2025-06-17 17:49:04.644 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:49:04.645 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 17:49:05.083 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 50)
+2025-06-17 17:49:06.755 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.718, AUPRC=0.370
+2025-06-17 17:49:06.755 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 17:49:06.755 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:49:06.756 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 17:49:06.756 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:49:13.719 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 2)
+2025-06-17 17:49:14.507 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.694, AUPRC=0.324
+2025-06-17 17:49:14.507 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:49:14.509 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 17:49:14.509 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:49:22.466 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 5)
+2025-06-17 17:49:23.601 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.695, AUPRC=0.331
+2025-06-17 17:49:23.601 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:49:23.604 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 17:49:23.604 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:49:32.814 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 10)
+2025-06-17 17:49:34.032 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.700, AUPRC=0.336
+2025-06-17 17:49:34.032 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:49:34.035 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 17:49:34.035 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:49:47.359 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 25)
+2025-06-17 17:49:49.049 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.703, AUPRC=0.336
+2025-06-17 17:49:49.050 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:49:49.052 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 17:49:49.052 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:50:06.041 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (4814, 50)
+2025-06-17 17:50:07.325 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.699, AUPRC=0.321
+2025-06-17 17:50:07.325 | INFO     | __main__:run_dimensionality_analysis:82 - 
+==================================================
+2025-06-17 17:50:07.325 | INFO     | __main__:run_dimensionality_analysis:83 - Processing task: new_hypertension
+2025-06-17 17:50:07.326 | INFO     | __main__:run_dimensionality_analysis:84 - ==================================================
+2025-06-17 17:50:07.345 | INFO     | __main__:run_dimensionality_analysis:90 - Loaded labeled patients for new_hypertension
+2025-06-17 17:50:22.546 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clmbr
+2025-06-17 17:50:22.548 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (1259, 768), Val: (1247, 768), Test: (1258, 768)
+2025-06-17 17:50:22.548 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.145, Val: 0.140, Test: 0.126
+2025-06-17 17:50:22.549 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:50:22.549 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:50:22.552 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:50:22.592 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 2)
+2025-06-17 17:50:22.957 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.607, AUPRC=0.201
+2025-06-17 17:50:22.957 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:50:22.957 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 17:50:23.012 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 5)
+2025-06-17 17:50:23.418 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.641, AUPRC=0.232
+2025-06-17 17:50:23.418 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:50:23.418 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 17:50:23.470 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 10)
+2025-06-17 17:50:24.044 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.655, AUPRC=0.240
+2025-06-17 17:50:24.044 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:50:24.045 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 17:50:24.131 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 25)
+2025-06-17 17:50:24.964 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.697, AUPRC=0.296
+2025-06-17 17:50:24.964 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:50:24.965 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 17:50:26.284 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 50)
+2025-06-17 17:50:27.384 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.700, AUPRC=0.310
+2025-06-17 17:50:27.384 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 17:50:27.384 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:50:27.384 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 17:50:27.384 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:50:39.301 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 2)
+2025-06-17 17:50:39.588 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.677, AUPRC=0.291
+2025-06-17 17:50:39.589 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:50:39.589 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 17:50:39.589 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:50:47.736 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 5)
+2025-06-17 17:50:48.116 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.692, AUPRC=0.289
+2025-06-17 17:50:48.116 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:50:48.116 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 17:50:48.117 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:50:56.893 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 10)
+2025-06-17 17:50:57.307 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.688, AUPRC=0.282
+2025-06-17 17:50:57.307 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:50:57.307 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 17:50:57.307 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:51:08.045 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 25)
+2025-06-17 17:51:08.792 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.688, AUPRC=0.282
+2025-06-17 17:51:08.792 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:51:08.793 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 17:51:08.793 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:51:21.415 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 50)
+2025-06-17 17:51:22.314 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.679, AUPRC=0.281
+2025-06-17 17:51:22.315 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clinicalbert_type3_clinicalbert_pool
+2025-06-17 17:51:22.317 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (1259, 768), Val: (1247, 768), Test: (1258, 768)
+2025-06-17 17:51:22.318 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.145, Val: 0.140, Test: 0.126
+2025-06-17 17:51:22.320 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:51:22.320 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:51:22.320 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:51:22.359 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 2)
+2025-06-17 17:51:22.698 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.596, AUPRC=0.202
+2025-06-17 17:51:22.698 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:51:22.699 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 17:51:22.739 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 5)
+2025-06-17 17:51:23.118 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.670, AUPRC=0.249
+2025-06-17 17:51:23.119 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:51:23.119 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 17:51:23.221 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 10)
+2025-06-17 17:51:23.655 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.711, AUPRC=0.307
+2025-06-17 17:51:23.655 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:51:23.655 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 17:51:23.699 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 25)
+2025-06-17 17:51:24.600 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.730, AUPRC=0.371
+2025-06-17 17:51:24.601 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:51:24.601 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 17:51:24.888 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 50)
+2025-06-17 17:51:25.716 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.738, AUPRC=0.353
+2025-06-17 17:51:25.716 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 17:51:25.716 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:51:25.716 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 17:51:25.717 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:51:33.356 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 2)
+2025-06-17 17:51:33.640 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.692, AUPRC=0.266
+2025-06-17 17:51:33.640 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 17:51:33.640 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 17:51:33.640 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:51:41.775 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 5)
+2025-06-17 17:51:42.094 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.696, AUPRC=0.303
+2025-06-17 17:51:42.094 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 17:51:42.094 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 17:51:42.094 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:51:50.832 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 10)
+2025-06-17 17:51:51.253 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.698, AUPRC=0.310
+2025-06-17 17:51:51.254 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 17:51:51.254 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 17:51:51.254 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:52:01.953 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 25)
+2025-06-17 17:52:02.794 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.701, AUPRC=0.322
+2025-06-17 17:52:02.794 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 17:52:02.794 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 17:52:02.794 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 17:52:15.360 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (2506, 50)
+2025-06-17 17:52:16.146 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.692, AUPRC=0.305
+2025-06-17 17:52:16.146 | INFO     | __main__:run_dimensionality_analysis:82 - 
+==================================================
+2025-06-17 17:52:16.146 | INFO     | __main__:run_dimensionality_analysis:83 - Processing task: lab_hyperkalemia
+2025-06-17 17:52:16.146 | INFO     | __main__:run_dimensionality_analysis:84 - ==================================================
+2025-06-17 17:52:17.069 | INFO     | __main__:run_dimensionality_analysis:90 - Loaded labeled patients for lab_hyperkalemia
+2025-06-17 17:59:15.713 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clmbr
+2025-06-17 17:59:15.789 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (76349, 768), Val: (60168, 768), Test: (63653, 768)
+2025-06-17 17:59:15.790 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.024, Val: 0.023, Test: 0.024
+2025-06-17 17:59:15.819 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 17:59:15.819 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 17:59:15.819 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 17:59:18.118 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 2)
+2025-06-17 18:09:18.919 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.520, AUPRC=0.025
+2025-06-17 18:09:18.922 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 18:09:18.922 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 18:09:21.585 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 5)
+2025-06-17 18:19:31.298 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.545, AUPRC=0.028
+2025-06-17 18:19:31.301 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 18:19:31.302 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 18:19:34.023 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 10)
+2025-06-17 18:30:29.951 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.592, AUPRC=0.041
+2025-06-17 18:30:29.952 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 18:30:29.953 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 18:30:33.960 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 25)
+2025-06-17 18:44:34.330 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.646, AUPRC=0.084
+2025-06-17 18:44:34.334 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 18:44:34.334 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 18:44:39.728 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 50)
+2025-06-17 18:58:53.899 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.663, AUPRC=0.098
+2025-06-17 18:58:53.902 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 18:58:53.902 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 18:58:53.902 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 18:58:53.902 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 19:00:49.460 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 2)
+2025-06-17 19:09:09.959 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.562, AUPRC=0.032
+2025-06-17 19:09:09.963 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 19:09:10.288 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 19:09:10.289 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 19:11:17.937 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 5)
+2025-06-17 19:19:49.781 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.609, AUPRC=0.052
+2025-06-17 19:19:49.781 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 19:19:50.102 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 19:19:50.103 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 19:22:21.544 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 10)
+2025-06-17 19:30:55.430 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.609, AUPRC=0.053
+2025-06-17 19:30:55.430 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 19:30:55.749 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 19:30:55.750 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 19:34:50.039 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 25)
+2025-06-17 19:43:41.823 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.606, AUPRC=0.053
+2025-06-17 19:43:41.824 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 19:43:42.144 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 19:43:42.145 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 19:49:16.576 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 50)
+2025-06-17 19:58:16.872 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.612, AUPRC=0.055
+2025-06-17 19:58:16.872 | INFO     | __main__:run_dimensionality_analysis:107 - 
+Processing model: clinicalbert_type3_clinicalbert_pool
+2025-06-17 19:58:16.999 | INFO     | __main__:run_dimensionality_analysis:126 - Data shapes - Train: (76349, 768), Val: (60168, 768), Test: (63653, 768)
+2025-06-17 19:58:17.000 | INFO     | __main__:run_dimensionality_analysis:127 - Label distribution - Train: 0.024, Val: 0.023, Test: 0.024
+2025-06-17 19:58:17.056 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: pca
+2025-06-17 19:58:17.056 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 19:58:17.373 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 2 dimensions
+2025-06-17 19:58:18.547 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 2)
+2025-06-17 20:05:47.166 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.634, AUPRC=0.082
+2025-06-17 20:05:47.167 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 20:05:47.167 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 5 dimensions
+2025-06-17 20:05:48.563 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 5)
+2025-06-17 20:13:16.969 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.738, AUPRC=0.173
+2025-06-17 20:13:16.970 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 20:13:16.970 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 10 dimensions
+2025-06-17 20:13:18.568 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 10)
+2025-06-17 20:22:39.940 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.754, AUPRC=0.190
+2025-06-17 20:22:39.941 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 20:22:39.941 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 25 dimensions
+2025-06-17 20:22:42.489 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 25)
+2025-06-17 20:32:10.797 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.758, AUPRC=0.194
+2025-06-17 20:32:10.798 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 20:32:10.798 | INFO     | reducers:fit_transform:43 - Applying PCA to reduce from 768 to 50 dimensions
+2025-06-17 20:32:13.868 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 50)
+2025-06-17 20:41:49.603 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.758, AUPRC=0.195
+2025-06-17 20:41:49.603 | INFO     | __main__:run_dimensionality_analysis:134 - 
+  Testing method: umap
+2025-06-17 20:41:49.603 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 2 dimensions...
+2025-06-17 20:41:49.604 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-06-17 20:41:49.604 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 20:47:06.468 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 2)
+2025-06-17 20:54:17.592 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.738, AUPRC=0.164
+2025-06-17 20:54:17.593 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 5 dimensions...
+2025-06-17 20:54:17.871 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-06-17 20:54:17.872 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 20:58:40.130 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 5)
+2025-06-17 21:05:47.830 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.751, AUPRC=0.178
+2025-06-17 21:05:47.830 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 10 dimensions...
+2025-06-17 21:05:48.110 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-06-17 21:05:48.111 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 21:10:45.773 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 10)
+2025-06-17 21:17:56.309 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.748, AUPRC=0.182
+2025-06-17 21:17:56.310 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 25 dimensions...
+2025-06-17 21:17:56.592 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-06-17 21:17:56.593 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 21:24:46.040 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 25)
+2025-06-17 21:32:12.575 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.748, AUPRC=0.176
+2025-06-17 21:32:12.576 | INFO     | __main__:run_dimensionality_analysis:141 -     Reducing to 50 dimensions...
+2025-06-17 21:32:12.856 | INFO     | reducers:fit_transform:109 - Applying UMAP to reduce from 768 to 50 dimensions
+2025-06-17 21:32:12.857 | INFO     | reducers:fit_transform:110 - Using n_neighbors: 15
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+2025-06-17 21:41:30.668 | INFO     | __main__:run_dimensionality_analysis:150 -     Reduced shape: (136517, 50)
+2025-06-17 21:49:04.295 | INFO     | __main__:run_dimensionality_analysis:166 -     Results: AUROC=0.752, AUPRC=0.178
+2025-06-17 21:49:04.310 | INFO     | __main__:run_dimensionality_analysis:187 - Results saved to ../EHRSHOT_ASSETS/dimensionality_analysis/dimensionality_results.csv
+2025-06-17 21:49:04.311 | INFO     | __main__:run_dimensionality_analysis:190 - Creating visualizations...
+2025-06-17 21:49:09.255 | INFO     | plotting:create_summary_table:258 - Summary table saved to ../EHRSHOT_ASSETS/dimensionality_analysis/dimensionality_summary.csv
+2025-06-17 21:49:09.570 | INFO     | __main__:main:284 - Analysis completed successfully!
+2025-06-17 21:49:09.587 | INFO     | __main__:main:285 - Generated 160 result entries
+2025-06-17 21:49:09.587 | INFO     | __main__:main:288 - 
+Summary by model and method:
+2025-06-17 21:49:09.588 | INFO     | __main__:main:298 -   clmbr + pca: 0.652 AUROC (avg)
+2025-06-17 21:49:09.589 | INFO     | __main__:main:298 -   clmbr + umap: 0.674 AUROC (avg)
+2025-06-17 21:49:09.590 | INFO     | __main__:main:298 -   clinicalbert_type3_clinicalbert_pool + pca: 0.678 AUROC (avg)
+2025-06-17 21:49:09.591 | INFO     | __main__:main:298 -   clinicalbert_type3_clinicalbert_pool + umap: 0.688 AUROC (avg)

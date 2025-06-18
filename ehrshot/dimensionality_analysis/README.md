@@ -42,10 +42,11 @@ ehrshot/
 - **Baselines**: Compares reduced dimensions against full 768D embeddings
 
 ### Tasks Analyzed (Default):
-- ICU Admission (operational outcome)
-- 30-day Readmission (operational outcome)  
-- Hypertension (new diagnosis)
-- Hyperkalemia (lab value prediction)
+- **Operational Outcomes**: ICU Admission, 30-day Readmission, Length of Stay  
+- **Lab Values**: Thrombocytopenia, Hyperkalemia, Hypoglycemia, Hyponatremia, Anemia
+- **New Diagnoses**: Hypertension, Hyperlipidemia, Pancreatic Cancer, Celiac Disease, Lupus, Acute MI
+
+**Total: 14 clinical prediction tasks** (all EHRSHOT tasks except CheXpert)
 
 ## Usage
 
@@ -63,7 +64,7 @@ python ehrshot/10_dimensionality_reduction.py \
     --path_to_features_dir path/to/features \
     --path_to_output_dir path/to/output \
     --path_to_split_csv path/to/splits.csv \
-    --dimensions 2 5 10 20 50 100 200 \
+    --dimensions 2 5 10 25 50 100 200 400 \
     --methods pca umap tsne \
     --tasks guo_icu guo_readmission \
     --k_shot -1
@@ -110,7 +111,7 @@ python ehrshot/10_dimensionality_reduction.py \
 ### Considerations:
 - **t-SNE Limitation**: Cannot transform new data, requires refitting for test set
 - **Sample Size**: Adjusts hyperparameters based on training set size for few-shot scenarios
-- **Scaling**: Applies MaxAbsScaler to reduced features before kNN training
+- **Scaling**: Applies MaxAbsScaler to reduced features before kNN training (identical to main pipeline)
 
 ## Expected Outcomes
 
