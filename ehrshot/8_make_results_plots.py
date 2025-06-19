@@ -144,6 +144,18 @@ def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame,
         plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_type_comparison_{score}.png"), dpi=300)
         plt.close('all')
         return fig
+    
+    # Handle "All" data point like in plot.py
+    ks = sorted(df_all_tasks['k'].unique().tolist())
+    x_tick_labels = [str(k) for k in ks]
+    if -1 in ks:
+        ks.remove(-1)
+        full_data_k = 2 * max(ks) if ks else 256  # fallback if no few-shot data
+        ks.append(full_data_k)
+        x_tick_labels = [str(k) if k != full_data_k else 'All' for k in ks]
+        # Update the data to use fake k value for plotting
+        df_all_tasks = df_all_tasks.copy()
+        df_all_tasks.loc[df_all_tasks['k'] == -1, 'k'] = full_data_k
         
     # Group by ClinicalBERT type - USE ONLY clinicalbert_pool strategy with lr_lbfgs head
     type1_data = df_all_tasks[df_all_tasks['model'] == 'clinicalbert_type1_clinicalbert_pool']
@@ -153,9 +165,9 @@ def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame,
     # Updated colors as requested: type1=blue, type2=green, type3=red
     # Use confidence interval lines instead of overlapping shaded areas
     for cb_type, cb_data, color, label in [
-        ('type1', type1_data, '#1f77b4', 'ClinicalBERT Type 1+LR'),
-        ('type2', type2_data, '#2ca02c', 'ClinicalBERT Type 2+LR'),
-        ('type3', type3_data, '#d62728', 'ClinicalBERT Type 3+LR')
+        ('type1', type1_data, '#1f77b4', 'ClinicalBERT Type 1 (Custom Pooling)+LR'),
+        ('type2', type2_data, '#2ca02c', 'ClinicalBERT Type 2 (Custom Pooling)+LR'),
+        ('type3', type3_data, '#d62728', 'ClinicalBERT Type 3 (Custom Pooling)+LR')
     ]:
         if cb_data.empty:
             continue
@@ -179,8 +191,8 @@ def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame,
     
     if is_x_scale_log:
         ax.set_xscale('log')
-        ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
-        ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+        ax.set_xticks(ks)
+        ax.set_xticklabels(x_tick_labels)
     
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=12, loc='lower right')
@@ -322,7 +334,8 @@ def plot_clinicalbert_pooling_comparison(df_results: pd.DataFrame,
     task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
     
     pooling_strategies = ['max_pool', 'mean_pool', 'clinicalbert_pool']
-    colors = ['red', 'blue', 'green']
+    colors = ['#1f77b4', '#2ca02c', '#d62728']  # blue, green, classic red (matching type comparison)
+    markers = ['o', 's', '^']
     
     for idx, task_group in enumerate(task_groups):
         ax = axes.flat[idx]
@@ -339,7 +352,7 @@ def plot_clinicalbert_pooling_comparison(df_results: pd.DataFrame,
             if not model_data.empty:
                 grouped = model_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
                 ax.errorbar(grouped['k'], grouped['mean'], yerr=grouped['std'], 
-                           color=color, label=pool_strategy.replace('_', ' ').title(), 
+                           color=color, label=pool_strategy.replace('_', ' ').title() + '+LR', 
                            linewidth=2, marker='o', markersize=6)
         
         ax.set_xlabel('K (Number of Training Examples)', fontsize=10)
@@ -355,6 +368,96 @@ def plot_clinicalbert_pooling_comparison(df_results: pd.DataFrame,
     plt.tight_layout()
     plt.subplots_adjust(top=0.92)
     plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_{cb_type}_pooling_{score}.png"), dpi=300)
+    plt.close('all')
+    return fig
+
+def plot_clinicalbert_pooling_comparison_mean_all_tasks(df_results: pd.DataFrame, 
+                                                       score: str, 
+                                                       path_to_output_dir: str,
+                                                       cb_type: str = 'type3'):
+    """Compare different pooling strategies for a specific ClinicalBERT type - Mean across ALL tasks"""
+    fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+    
+    # Get ALL labeling functions (aggregate across all task groups)
+    all_labeling_functions = []
+    for task_group_functions in TASK_GROUP_2_LABELING_FUNCTION.values():
+        all_labeling_functions.extend(task_group_functions)
+    
+    pooling_strategies = ['max_pool', 'mean_pool', 'clinicalbert_pool']
+    colors = ['#1f77b4', '#2ca02c', '#d62728']  # blue, green, classic red (matching type comparison)
+    markers = ['o', 's', '^']
+    
+    # First get all data to determine k values for "All" handling
+    all_model_data = df_results[
+        (df_results['score'] == score) & 
+        (df_results['labeling_function'].isin(all_labeling_functions)) &
+        (df_results['head'] == 'lr_lbfgs')
+    ]
+    
+    # Handle "All" data point like in plot.py
+    ks = sorted(all_model_data['k'].unique().tolist())
+    x_tick_labels = [str(k) for k in ks]
+    if -1 in ks:
+        ks.remove(-1)
+        full_data_k = 2 * max(ks) if ks else 256  # fallback if no few-shot data
+        ks.append(full_data_k)
+        x_tick_labels = [str(k) if k != full_data_k else 'All' for k in ks]
+    
+    for pool_strategy, color, marker in zip(pooling_strategies, colors, markers):
+        model_name = f'clinicalbert_{cb_type}_{pool_strategy}'
+        model_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(all_labeling_functions)) &
+            (df_results['model'] == model_name) &
+            (df_results['head'] == 'lr_lbfgs')  # Only use LR prediction head
+        ]
+        
+        if not model_data.empty:
+            # Update k=-1 to fake k value for plotting if needed
+            if -1 in model_data['k'].values:
+                model_data = model_data.copy()
+                model_data.loc[model_data['k'] == -1, 'k'] = full_data_k
+            
+            # Group by k-value and compute mean/std across ALL tasks
+            grouped = model_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+            
+            # Create label with special handling for clinicalbert_pool
+            if pool_strategy == 'clinicalbert_pool':
+                label = 'ClinicalBERT Pool (Custom Pooling)+LR'
+            else:
+                label = pool_strategy.replace('_', ' ').title() + '+LR'
+            
+            # Plot main line
+            ax.plot(grouped['k'], grouped['mean'], 
+                   color=color, 
+                   label=label, 
+                   linewidth=3, 
+                   marker=marker, 
+                   markersize=8)
+            
+            # Add confidence interval lines instead of error bars for cleaner look
+            ax.plot(grouped['k'], grouped['mean'] + grouped['std'], 
+                   color=color, linewidth=1, alpha=0.6, linestyle='--')
+            ax.plot(grouped['k'], grouped['mean'] - grouped['std'], 
+                   color=color, linewidth=1, alpha=0.6, linestyle='--')
+    
+    ax.set_xlabel('# of Train Examples per Class', fontsize=14)
+    ax.set_ylabel(f'Mean {score.upper()} Score Over All Tasks', fontsize=14)
+    # Title removed as requested
+    
+    ax.set_xscale('log')
+    ax.set_xticks(ks)
+    ax.set_xticklabels(x_tick_labels)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=12, loc='lower right')
+    
+    # Improve overall aesthetics
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.tick_params(labelsize=12)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(path_to_output_dir, f"clinicalbert_{cb_type}_pooling_mean_all_tasks_{score}.png"), dpi=300, bbox_inches='tight')
     plt.close('all')
     return fig
 
@@ -601,105 +704,264 @@ def plot_linear_vs_nonlinear_heads(df_results: pd.DataFrame,
 def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame, 
                                           score: str, 
                                           path_to_output_dir: str):
-    """Create detailed task-by-task comparison of CLMBR vs ClinicalBERT for shared heads"""
+    """Create a single consolidated plot comparing CLMBR vs ClinicalBERT across all tasks"""
     
     # Get tasks with both CLMBR and ClinicalBERT data
     shared_heads = ['lr_lbfgs', 'knn']
-    cb_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+    cb_model = 'clinicalbert_type3_clinicalbert_pool'  # Use type3 clinicalbert_pool as requested
     
     valid_tasks = []
-    for task in df_results['labeling_function'].unique():
-        clmbr_data = df_results[
-            (df_results['labeling_function'] == task) &
-            (df_results['model'] == 'clmbr') &
-            (df_results['head'].isin(shared_heads)) &
-            (df_results['score'] == score)
-        ]
-        cb_data = df_results[
-            (df_results['labeling_function'] == task) &
-            (df_results['model'].isin(cb_models)) &
-            (df_results['head'].isin(shared_heads)) &
-            (df_results['score'] == score)
-        ]
-        if not clmbr_data.empty and not cb_data.empty:
-            valid_tasks.append(task)
+    task_categories = []
+    
+    # Build task list with categories
+    for task_group, tasks in TASK_GROUP_2_LABELING_FUNCTION.items():
+        for task in tasks:
+            clmbr_data = df_results[
+                (df_results['labeling_function'] == task) &
+                (df_results['model'] == 'clmbr') &
+                (df_results['head'].isin(shared_heads)) &
+                (df_results['score'] == score) &
+                (df_results['k'] == -1)  # Full data only
+            ]
+            cb_data = df_results[
+                (df_results['labeling_function'] == task) &
+                (df_results['model'] == cb_model) &
+                (df_results['head'].isin(shared_heads)) &
+                (df_results['score'] == score) &
+                (df_results['k'] == -1)
+            ]
+            if not clmbr_data.empty and not cb_data.empty:
+                valid_tasks.append(task)
+                task_categories.append(task_group)
     
     if len(valid_tasks) == 0:
         print(f"No valid tasks found for detailed comparison ({score})")
         return None
     
-    # Create subplot grid based on number of tasks
-    n_tasks = len(valid_tasks)
-    n_cols = 4
-    n_rows = (n_tasks + n_cols - 1) // n_cols
+    # Create a single large plot
+    fig, ax = plt.subplots(1, 1, figsize=(20, 10))
     
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, 5*n_rows))
-    if n_rows == 1:
-        axes = axes.reshape(1, -1)
+    # Prepare data for plotting
+    x_positions = np.arange(len(valid_tasks))
+    bar_width = 0.35
     
-    for idx, task in enumerate(valid_tasks):
-        row = idx // n_cols
-        col = idx % n_cols
-        ax = axes[row, col]
-        
+    clmbr_best_scores = []
+    cb_best_scores = []
+    clmbr_best_heads = []
+    cb_best_heads = []
+    
+    # For each task, find the best performing head for each model
+    for task in valid_tasks:
+        # CLMBR performance by head
+        clmbr_performances = {}
         for head in shared_heads:
-            # CLMBR data
             clmbr_data = df_results[
                 (df_results['labeling_function'] == task) &
                 (df_results['model'] == 'clmbr') &
                 (df_results['head'] == head) &
                 (df_results['score'] == score) &
-                (df_results['k'] == -1)  # Full data only for clarity
+                (df_results['k'] == -1)
             ]
-            
-            # Best ClinicalBERT data for this head
+            if not clmbr_data.empty:
+                clmbr_performances[head] = clmbr_data['value'].mean()
+        
+        # ClinicalBERT performance by head
+        cb_performances = {}
+        for head in shared_heads:
             cb_data = df_results[
                 (df_results['labeling_function'] == task) &
-                (df_results['model'].isin(cb_models)) &
+                (df_results['model'] == cb_model) &
                 (df_results['head'] == head) &
                 (df_results['score'] == score) &
                 (df_results['k'] == -1)
             ]
-            
-            if not clmbr_data.empty and not cb_data.empty:
-                clmbr_perf = clmbr_data['value'].mean()
-                best_cb_perf = cb_data.groupby('model')['value'].mean().max()
-                
-                # Plot bars for this head
-                x_pos = 0 if head == 'lr_lbfgs' else 1
-                bar_width = 0.35
-                
-                ax.bar(x_pos - bar_width/2, clmbr_perf, bar_width, 
-                      label=f'CLMBR' if head == 'lr_lbfgs' else '', 
-                      color='blue', alpha=0.7)
-                ax.bar(x_pos + bar_width/2, best_cb_perf, bar_width, 
-                      label=f'Best ClinicalBERT' if head == 'lr_lbfgs' else '', 
-                      color='red', alpha=0.7)
-                
-                # Add value labels on bars
-                ax.text(x_pos - bar_width/2, clmbr_perf + 0.01, f'{clmbr_perf:.3f}', 
-                       ha='center', va='bottom', fontsize=8)
-                ax.text(x_pos + bar_width/2, best_cb_perf + 0.01, f'{best_cb_perf:.3f}', 
-                       ha='center', va='bottom', fontsize=8)
+            if not cb_data.empty:
+                cb_performances[head] = cb_data['value'].mean()
         
-        ax.set_xticks([0, 1])
-        ax.set_xticklabels(['LR', 'KNN'])
-        ax.set_ylabel(f'{score.upper()}', fontsize=10)
-        ax.set_title(LABELING_FUNCTION_2_PAPER_NAME.get(task, task), fontsize=10)
-        ax.grid(True, alpha=0.3, axis='y')
-        if idx == 0:
-            ax.legend(fontsize=8)
+        # Find best performing heads
+        if clmbr_performances:
+            best_clmbr_head = max(clmbr_performances, key=clmbr_performances.get)
+            clmbr_best_scores.append(clmbr_performances[best_clmbr_head])
+            clmbr_best_heads.append(best_clmbr_head)
+        else:
+            clmbr_best_scores.append(0)
+            clmbr_best_heads.append('N/A')
+            
+        if cb_performances:
+            best_cb_head = max(cb_performances, key=cb_performances.get)
+            cb_best_scores.append(cb_performances[best_cb_head])
+            cb_best_heads.append(best_cb_head)
+        else:
+            cb_best_scores.append(0)
+            cb_best_heads.append('N/A')
     
-    # Hide unused subplots
-    for idx in range(n_tasks, n_rows * n_cols):
-        row = idx // n_cols
-        col = idx % n_cols
-        axes[row, col].set_visible(False)
+    # Create bars
+    bars1 = ax.bar(x_positions - bar_width/2, clmbr_best_scores, bar_width, 
+                   label='CLMBR (Best Head)', color='steelblue', alpha=0.8)
+    bars2 = ax.bar(x_positions + bar_width/2, cb_best_scores, bar_width, 
+                   label='ClinicalBERT Type3 (Best Head)', color='lightcoral', alpha=0.8)
     
-    fig.suptitle(f'CLMBR vs Best ClinicalBERT by Task and Prediction Head - {score.upper()}', fontsize=16)
+    # Add value labels on bars with best head information
+    for i, (bar1, bar2, clmbr_head, cb_head) in enumerate(zip(bars1, bars2, clmbr_best_heads, cb_best_heads)):
+        # CLMBR bars
+        height1 = bar1.get_height()
+        ax.text(bar1.get_x() + bar1.get_width()/2., height1 + 0.005,
+                f'{height1:.3f}\n({clmbr_head.replace("lr_lbfgs", "LR").replace("knn", "KNN")})',
+                ha='center', va='bottom', fontsize=8, fontweight='bold')
+        
+        # ClinicalBERT bars  
+        height2 = bar2.get_height()
+        ax.text(bar2.get_x() + bar2.get_width()/2., height2 + 0.005,
+                f'{height2:.3f}\n({cb_head.replace("lr_lbfgs", "LR").replace("knn", "KNN")})',
+                ha='center', va='bottom', fontsize=8, fontweight='bold')
+    
+    # Customize x-axis with task names and categories
+    task_labels = [LABELING_FUNCTION_2_PAPER_NAME.get(task, task) for task in valid_tasks]
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels(task_labels, rotation=45, ha='right')
+    
+    # Add category colors as background shading
+    category_colors = {'operational_outcomes': 'lightblue', 'lab_values': 'lightgreen', 'new_diagnoses': 'lightyellow'}
+    current_category = None
+    start_idx = 0
+    
+    for i, category in enumerate(task_categories + [None]):  # Add None to trigger final category
+        if category != current_category:
+            if current_category is not None:
+                # Shade the previous category
+                ax.axvspan(start_idx - 0.5, i - 0.5, alpha=0.2, color=category_colors.get(current_category, 'lightgray'))
+            current_category = category
+            start_idx = i
+    
+    # Add category labels at the top
+    category_positions = {}
+    for i, category in enumerate(task_categories):
+        if category not in category_positions:
+            category_positions[category] = []
+        category_positions[category].append(i)
+    
+    y_top = ax.get_ylim()[1]
+    for category, positions in category_positions.items():
+        center_pos = (min(positions) + max(positions)) / 2
+        category_name = TASK_GROUP_2_PAPER_NAME.get(category, category).replace(' ', '\n')
+        ax.text(center_pos, y_top * 1.15, category_name, ha='center', va='center', 
+                fontsize=10, fontweight='bold', 
+                bbox=dict(boxstyle="round,pad=0.3", facecolor=category_colors.get(category, 'lightgray'), alpha=0.7))
+    
+    # Formatting
+    ax.set_ylabel(f'{score.upper()}', fontsize=14, fontweight='bold')
+    ax.set_title(f'CLMBR vs ClinicalBERT Type3 Performance by Task\n(Best Prediction Head Shown for Each Model)', 
+                 fontsize=16, fontweight='bold', pad=40)
+    ax.grid(True, alpha=0.3, axis='y')
+    ax.legend(loc='upper right', fontsize=12)
+    
+    # Improve aesthetics
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.set_ylim(0, max(max(clmbr_best_scores), max(cb_best_scores)) * 1.25)
+    
     plt.tight_layout()
-    plt.subplots_adjust(top=0.95)
-    plt.savefig(os.path.join(path_to_output_dir, f"detailed_task_embedding_comparison_{score}.png"), dpi=300)
+    plt.subplots_adjust(top=0.85, bottom=0.15)
+    plt.savefig(os.path.join(path_to_output_dir, f"detailed_task_embedding_comparison_{score}.png"), dpi=300, bbox_inches='tight')
+    plt.close('all')
+    return fig
+
+def plot_embedding_comparison_lr_only(df_results: pd.DataFrame, 
+                                    score: str, 
+                                    path_to_output_dir: str):
+    """Compare CLMBR vs ClinicalBERT embeddings using only LR prediction head with optimized layout"""
+    task_groups: List[str] = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    n_groups = len(task_groups)
+    
+    # Create a more efficient layout for 3 task groups
+    if n_groups == 3:
+        fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    else:
+        # Fallback to square layout for other numbers
+        n_cols = int(np.ceil(np.sqrt(n_groups)))
+        n_rows = int(np.ceil(n_groups / n_cols))
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(6*n_cols, 6*n_rows))
+        axes = axes.flatten()
+    
+    # Only use LR prediction head
+    lr_head = 'lr_lbfgs'
+    
+    # Define colors and styles
+    clmbr_style = {'color': 'blue', 'linestyle': '-', 'marker': 's', 'label': 'CLMBR + LR'}
+    cb_style = {'color': 'lightcoral', 'linestyle': '-', 'marker': '^', 'label': 'Best ClinicalBERT + LR'}
+    
+    for idx, task_group in enumerate(task_groups):
+        ax = axes[idx] if n_groups > 1 else axes
+        labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+        
+        # Plot CLMBR performance with LR head
+        clmbr_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'] == 'clmbr') &
+            (df_results['head'] == lr_head)
+        ]
+        
+        if not clmbr_data.empty:
+            clmbr_grouped = clmbr_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+            ax.errorbar(clmbr_grouped['k'], clmbr_grouped['mean'], yerr=clmbr_grouped['std'], 
+                       color=clmbr_style['color'], 
+                       linestyle=clmbr_style['linestyle'],
+                       marker=clmbr_style['marker'], 
+                       label=clmbr_style['label'],
+                       linewidth=2.5, markersize=8, alpha=0.9)
+        
+        # Plot best ClinicalBERT performance with LR head
+        cb_models = [model for model in df_results['model'].unique() if 'clinicalbert' in model]
+        
+        cb_data = df_results[
+            (df_results['score'] == score) & 
+            (df_results['labeling_function'].isin(labeling_functions)) &
+            (df_results['model'].isin(cb_models)) &
+            (df_results['head'] == lr_head)
+        ]
+        
+        if not cb_data.empty:
+            # Find best ClinicalBERT model for this head at full data
+            full_data_cb = cb_data[cb_data['k'] == -1]
+            if not full_data_cb.empty:
+                best_cb_model = full_data_cb.groupby('model')['value'].mean().idxmax()
+                best_cb_data = cb_data[cb_data['model'] == best_cb_model]
+                cb_grouped = best_cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+                
+                ax.errorbar(cb_grouped['k'], cb_grouped['mean'], yerr=cb_grouped['std'], 
+                           color=cb_style['color'],
+                           linestyle=cb_style['linestyle'],
+                           marker=cb_style['marker'],
+                           label=cb_style['label'],
+                           linewidth=2.5, markersize=8, alpha=0.9)
+        
+        ax.set_xlabel('K (Number of Training Examples)', fontsize=12)
+        ax.set_ylabel(f'{score.upper()}', fontsize=12)
+        ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]}', fontsize=14, fontweight='bold')
+        ax.set_xscale('log')
+        ax.set_xticks([1, 2, 4, 8, 16, 32, 64, 128])
+        ax.set_xticklabels(['1', '2', '4', '8', '16', '32', '64', '128'])
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=10, loc='best')
+        
+        # Make the plot look more polished
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_linewidth(0.5)
+        ax.spines['bottom'].set_linewidth(0.5)
+    
+    # Hide unused subplots if any
+    if n_groups > 1 and hasattr(axes, '__len__'):
+        for idx in range(n_groups, len(axes)):
+            axes[idx].set_visible(False)
+    
+    fig.suptitle(f'CLMBR vs ClinicalBERT Embeddings - Logistic Regression Head - {score.upper()}', 
+                 fontsize=16, fontweight='bold')
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.88)
+    plt.savefig(os.path.join(path_to_output_dir, f"embedding_comparison_lr_only_{score}.png"), 
+                dpi=300, bbox_inches='tight')
     plt.close('all')
     return fig
 
@@ -929,6 +1191,12 @@ if __name__ == "__main__":
             if score == 'brier': continue
             plot_clinicalbert_pooling_comparison(df_results, score, clinicalbert_dir, cb_type)
     
+    # Plot pooling strategy comparisons for each ClinicalBERT type - Mean across ALL tasks
+    for cb_type in ['type1', 'type2', 'type3']:
+        for score in tqdm(df_results['score'].unique(), desc=f'plot_clinicalbert_{cb_type}_pooling_mean_all_tasks()'):
+            if score == 'brier': continue
+            plot_clinicalbert_pooling_comparison_mean_all_tasks(df_results, score, clinicalbert_dir, cb_type)
+    
     # Plot embedding comparison using shared heads
     for score in tqdm(df_results['score'].unique(), desc='plot_embedding_comparison_shared_heads()'):
         if score == 'brier': continue
@@ -943,5 +1211,10 @@ if __name__ == "__main__":
     for score in tqdm(df_results['score'].unique(), desc='plot_detailed_task_embedding_comparison()'):
         if score == 'brier': continue
         plot_detailed_task_embedding_comparison(df_results, score, clinicalbert_dir)
+    
+    # Plot embedding comparison using only LR prediction head
+    for score in tqdm(df_results['score'].unique(), desc='plot_embedding_comparison_lr_only()'):
+        if score == 'brier': continue
+        plot_embedding_comparison_lr_only(df_results, score, clinicalbert_dir)
     
     print(f"ClinicalBERT plots saved to {clinicalbert_dir}")
