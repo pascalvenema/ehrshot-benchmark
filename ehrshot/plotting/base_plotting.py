@@ -3,14 +3,29 @@ from typing import List, Optional, Tuple
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import (
-    LABELING_FUNCTION_2_PAPER_NAME,
-    HEAD_2_INFO,
-    MODEL_2_INFO, 
-    TASK_GROUP_2_PAPER_NAME,
-    SCORE_MODEL_HEAD_2_COLOR,
-    filter_df,
-)
+
+try:
+    from ..utils import (
+        LABELING_FUNCTION_2_PAPER_NAME,
+        HEAD_2_INFO,
+        MODEL_2_INFO, 
+        TASK_GROUP_2_PAPER_NAME,
+        SCORE_MODEL_HEAD_2_COLOR,
+        filter_df,
+    )
+except ImportError:
+    # Fallback for direct execution
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+    from utils import (
+        LABELING_FUNCTION_2_PAPER_NAME,
+        HEAD_2_INFO,
+        MODEL_2_INFO, 
+        TASK_GROUP_2_PAPER_NAME,
+        SCORE_MODEL_HEAD_2_COLOR,
+        filter_df,
+    )
 
 def _plot_unified_legend(fig, axes, ncol=None, fontsize=14):
     """Create a unified legend for the entire figure."""
@@ -99,6 +114,14 @@ def plot_one_labeling_function(df: pd.DataFrame,
     for m_idx, model in enumerate(models):
         heads: List[str] = df[df['model'] == model]['head'].unique().tolist()
         for h_idx, head in enumerate(heads):
+            # Skip unsupported scores
+            if score not in SCORE_MODEL_HEAD_2_COLOR:
+                continue
+            if model not in SCORE_MODEL_HEAD_2_COLOR[score]:
+                continue
+            if head not in SCORE_MODEL_HEAD_2_COLOR[score][model]:
+                continue
+                
             model_name: str = MODEL_2_INFO[model]['label']
             head_name: str = HEAD_2_INFO[head]['label']
 
@@ -132,7 +155,6 @@ def plot_one_labeling_function(df: pd.DataFrame,
     ax.set_xlabel("# of Train Examples per Class", fontsize=10)
     ax.set_xticks(ks, ks)
     ax.set_xticklabels(x_tick_labels)
-
 
     
 def plot_one_task_group(df: pd.DataFrame, 
@@ -190,6 +212,14 @@ def plot_one_task_group(df: pd.DataFrame,
     for m_idx, model in enumerate(models):
         heads: List[str] = df[df['model'] == model]['head'].unique().tolist()
         for h_idx, head in enumerate(heads):
+            # Skip unsupported scores
+            if score not in SCORE_MODEL_HEAD_2_COLOR:
+                continue
+            if model not in SCORE_MODEL_HEAD_2_COLOR[score]:
+                continue
+            if head not in SCORE_MODEL_HEAD_2_COLOR[score][model]:
+                continue
+                
             model_name: str = MODEL_2_INFO[model]['label']
             head_name: str = HEAD_2_INFO[head]['label']
 
@@ -198,12 +228,13 @@ def plot_one_task_group(df: pd.DataFrame,
             # Color
             color: str = SCORE_MODEL_HEAD_2_COLOR[score][model][head]
 
-            # Plot individual subtasks
-            for subtask in df_means_['sub_task'].unique():
-                df_m_ = df_means_[df_means_['sub_task'] == subtask]
-                ax.plot(df_m_['k'], df_m_['value'], color=color, linestyle='-', linewidth=2, alpha=0.25)
-    
-            # Plot average line per model
+            # Plot individual labeling functions (faded lines)
+            for labeling_function in df_means_['labeling_function'].unique():
+                df_lf_ = df_means_[df_means_['labeling_function'] == labeling_function]
+                df_lf_mean = df_lf_.groupby(['k']).agg({ 'value' : 'mean', 'k': 'first', }).reset_index(drop = True)
+                ax.plot(df_lf_mean['k'], df_lf_mean['value'], color=color, linestyle='-', linewidth=1, alpha=0.4)
+
+            # Plot average line across all labeling functions (dark line)
             df_ = df_means_.groupby(['k']).agg({ 'value' : 'mean', 'k': 'first', }).reset_index(drop = True)
             ax.plot(df_['k'], df_['value'], color=color, label=f'{model_name}+{head_name}', linestyle='-', marker='o', linewidth=3, markersize=7)
 
@@ -225,117 +256,76 @@ def plot_one_task_group_box_plot(df: pd.DataFrame,
                                 score: str,
                                 model_heads: Optional[List[Tuple[str, str]]] = None):
     """
-        Graph: Aggregated box plot containing each model+head's results for all of the labeling functions within a task group, as a function of `k`,
-            where results are the relative difference between the `k`-shot model+head and the full data model+head.
+        Graph: Box plot showing distribution of scores for each model+head combination in this task group (at k=-1)
     
-            y-axis = model+head's achieved score across replicates and labeling functions within a task group, relative to its score with full data
-            x-axis = # of train examples per class (e.g. 1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
+            y-axis = model+head's achieved mean score across replicates (e.g. AUROC/AUPRC)
+            x-axis = model+head combinations
+            box plots = distribution of model+head's score across labeling functions in this task group
     """
-    # Select specific task group, score, (model, head) combos
-    df = filter_df(df, task_group=task_group, score=score, model_heads=model_heads)
-    
-    # Get all `k` shots tested
-    ks: List[int] = sorted(df['k'].unique().tolist())
-    
-    # Create a fake `k` for the full data which is 2x the max `k` in the few-shot data
-    assert -1 in ks, f"Full data not present in {task_group} for {score}"
-    ks.remove(-1)
-    full_data_k: int = 2 * max(ks)
-    df.loc[df['k'] == -1, 'k'] = full_data_k
-    x_tick_labels = ks
-    positions: np.ndarray = np.arange(len(ks))
 
-    # Merge all scores at each `k` across all tasks for each model+head
-    df_grouped = df.groupby([
+    # Limit to full data (k=-1) for a specific task_group, score, (model, head) combos
+    df = filter_df(df, score=score, task_group=task_group, model_heads=model_heads, ks=[-1])
+
+    if df.shape[0] == 0:
+        print(f"Skipping {task_group} because no results for {model_heads}")
+        return
+
+    # Aggregate results at the labeling function level (mean across subtasks and replicates)
+    df_agg = df.groupby([
+        'labeling_function',
         'model',
         'head',
         'score',
-        'k',
     ]).agg({
-        'value' : list,
+        'value' : 'mean',
+        'labeling_function' : 'first',
         'model' : 'first',
         'head' : 'first',
         'score' : 'first',
-        'k' : 'first',
     }).reset_index(drop = True)
+
+    # Prepare data for box plot
+    model_head_combinations = df_agg[['model', 'head']].drop_duplicates()
+    box_data = []
+    labels = []
+    colors = []
+
+    for _, row in model_head_combinations.iterrows():
+        model, head = row['model'], row['head']
+        
+        # Skip unsupported scores
+        if score not in SCORE_MODEL_HEAD_2_COLOR:
+            continue
+        if model not in SCORE_MODEL_HEAD_2_COLOR[score]:
+            continue
+        if head not in SCORE_MODEL_HEAD_2_COLOR[score][model]:
+            continue
+            
+        model_head_data = df_agg[(df_agg['model'] == model) & (df_agg['head'] == head)]
+        box_data.append(model_head_data['value'].tolist())
+        
+        model_name = MODEL_2_INFO[model]['label']
+        head_name = HEAD_2_INFO[head]['label']
+        labels.append(f'{model_name}+{head_name}')
+        
+        color = SCORE_MODEL_HEAD_2_COLOR[score][model][head]
+        colors.append(color)
+
+    if not box_data:
+        print(f"No valid model-head combinations for {task_group}")
+        return
+
+    # Create box plot
+    bp = ax.boxplot(box_data, labels=labels, patch_artist=True)
     
-    # Create the boxplots
-    n_replicates: int = df['replicate'].nunique()
-    width = 0.3  # width of the boxplot
-    models: List[str] = df_grouped['model'].unique().tolist()
-    shift_amt: int = 0
-    for model in models:
-        heads: List[str] = df_grouped[df_grouped['model'] == model]['head'].unique().tolist()
-        for head in heads:
-            df_ = df_grouped[(df_grouped['model'] == model) & (df_grouped['head'] == head)]
-            full_data_values: np.ndarray = np.array([ [x] * n_replicates for x in df_[df_['k'] == full_data_k]['value'].tolist() ]).flatten() # expand to match # of replicates, since only use 1 replicate for `all`
-            values: np.ndarray = np.array(df_[df_['k'] != full_data_k]['value'].tolist())
+    # Color the boxes
+    for patch, color in zip(bp['boxes'], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
 
-            # Get relative difference between full data v. few-shot
-            values = values - full_data_values
-
-            # create boxplots at positions shifted by the width + spacing btwn boxplots
-            bp = ax.boxplot(values.tolist(), positions=positions + shift_amt * width - width / 2 + (shift_amt * 0.05), widths=width, showfliers=False, manage_ticks=False, patch_artist=True)
-            shift_amt += 1
-
-            # set the outline color
-            for element in ['boxes', 'whiskers', 'fliers', 'medians', 'caps']:
-                for box in bp[element]:
-                    box.set(color=SCORE_MODEL_HEAD_2_COLOR[score][model][head])
-            plt.setp(bp['boxes'], facecolor='white')
-            # Increase the size of the median line and set to black
-            for median_line in bp['medians']:
-                median_line.set_linewidth(3)
-
-    # Draw line at 0
-    ax.axhline(0, color='black', linestyle='dashed')
-    if task_group == 'chexpert':
-        ax.text(0.2, 0.975, '▲ Few-shot better', transform=ax.transAxes, fontsize=8,
-            verticalalignment='top', bbox=dict(boxstyle='round', facecolor='green', alpha=0.3, pad=0.3))
-        ax.text(0.2, 0.05, '▼ Full data better', transform=ax.transAxes, fontsize=8,
-            verticalalignment='top', bbox=dict(boxstyle='round', facecolor='red', alpha=0.3, pad=0.3))
-    else:
-        ax.text(0.2, 0.95, '▲ Few-shot better', transform=ax.transAxes, fontsize=8,
-            verticalalignment='top', bbox=dict(boxstyle='round', facecolor='green', alpha=0.3, pad=0.3))
-        ax.text(0.2, 0.07, '▼ Full data better', transform=ax.transAxes, fontsize=8,
-            verticalalignment='top', bbox=dict(boxstyle='round', facecolor='red', alpha=0.3, pad=0.3))
-
-    # show plot
-    ax.set_xlabel("# of Train Examples per Class", fontsize=12)
-    ax.set_ylabel(f'{score.upper()} gain from k-shot v. full data model', fontsize=12)
-    ax.set_title(TASK_GROUP_2_PAPER_NAME[task_group], size=14)
-    ax.tick_params(axis='x', labelsize=10)
+    # Plot aesthetics
+    ax.tick_params(axis='x', labelsize=8, rotation=45)
     ax.tick_params(axis='y', labelsize=10)
-    ax.set_xticks(positions, labels=x_tick_labels)
-    ax.get_xaxis().tick_bottom()
-    ax.get_yaxis().tick_left()
-
-def plot_column_per_patient(df_demo: pd.DataFrame, 
-                            path_to_output_dir: str,
-                            column: str, 
-                            x_label: str, 
-                            title: str,
-                            max_clamp: int = None):
-    """
-    3 panels, one for each split
-        Histogram
-            x-axis: # of events in a patient timeline
-            y-axis: # of patients with that # of events
-    """
-    fig, axes = plt.subplots(1, 3, figsize=(20, 5))
-    for idx, split in enumerate(['train', 'val', 'test']):
-        df_ = df_demo[df_demo['split'] == split]
-        counts = df_[column].tolist()
-        
-        # Clamp at `max_clamp`
-        if max_clamp:
-            counts = [ min(count, max_clamp) for count in counts ]
-        
-        axes[idx].hist(counts, bins=100)
-        axes[idx].set_xlabel(f"{x_label}")
-        axes[idx].set_ylabel("# of Patients")
-        axes[idx].legend()
-        axes[idx].set_title(f'{split} (n={len(counts)})')
-    fig.suptitle(f"Distribution of {title}/patient")
-    plt.savefig(os.path.join(path_to_output_dir, f'{column}_per_patient.png'))
-    plt.show()
+    ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]} (Full Data)', size=14)
+    ax.set_ylabel(score.upper(), fontsize=10)
+    ax.grid(True, alpha=0.3) 

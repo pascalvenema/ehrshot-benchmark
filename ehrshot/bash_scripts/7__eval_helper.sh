@@ -16,7 +16,7 @@ source activate EHRSHOT_ENV
 # Check whether the GPU is available
 srun python -uc "import torch; print('GPU available?', torch.cuda.is_available())"
 
-python3 ../7_eval.py \
+python3 ../evaluation.py \
     --path_to_database $1 \
     --path_to_labels_dir $2 \
     --path_to_features_dir $3 \

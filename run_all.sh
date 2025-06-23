@@ -1,12 +1,33 @@
 #!/bin/bash
 
-cd ehrshot/bash_scripts
+echo "🎯 EHRSHOT - Essential Plots Only"
+echo "=================================="
+echo ""
 
-# Train baseline models and generate metrics.
-# bash 7_eval.sh
+# Set default paths
+RESULTS_DIR="${RESULTS_DIR:-EHRSHOT_ASSETS/results}"
+OUTPUT_DIR="${OUTPUT_DIR:-EHRSHOT_ASSETS/figures}"
 
-# Generate plots
-bash 8_make_results_plots.sh
+echo "📁 Creating output directory..."
+mkdir -p "$OUTPUT_DIR"
 
-# Generate cohort statistics
-# bash 9_make_cohort_plots.sh
+echo ""
+echo "🎨 Generating essential plots..."
+echo "==============================="
+
+# Use the centralized plotting script
+bash generate_all_plots.sh
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "🎉 SUCCESS!"
+    echo "=========="
+    echo "✅ All essential plots generated successfully!"
+    echo "📂 Check your plots in: $OUTPUT_DIR"
+else
+    echo ""
+    echo "❌ FAILED!"
+    echo "========="
+    echo "Plot generation encountered errors."
+    exit 1
+fi

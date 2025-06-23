@@ -155,14 +155,6 @@ def run_evaluation(X_train: np.ndarray,
     logger.info(f"Val AUROC:   {val_auroc}")
     logger.info(f"Test AUROC:  {test_auroc}")
     
-    # Brier Score
-    train_brier = metrics.brier_score_loss(y_train, y_train_proba)
-    val_brier = metrics.brier_score_loss(y_val, y_val_proba)
-    test_brier = metrics.brier_score_loss(y_test, y_test_proba)
-    logger.info(f"Train brier score: {train_brier}")
-    logger.info(f"Val brier score:   {val_brier}")
-    logger.info(f"Test brier score:  {test_brier}")
-    
     # Precision
     train_auprc = metrics.average_precision_score(y_train, y_train_proba)
     val_auprc = metrics.average_precision_score(y_val, y_val_proba)
@@ -174,7 +166,6 @@ def run_evaluation(X_train: np.ndarray,
     return model, {
         'auroc' : test_auroc,
         'auprc' : test_auprc,
-        'brier' : test_brier,
     }
 
 def parse_args() -> argparse.Namespace:

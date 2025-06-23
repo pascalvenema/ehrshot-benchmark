@@ -54,7 +54,7 @@ mkdir -p "$OUTPUT_PATH"
 
 # Run the analysis
 echo "🚀 Running dimensionality reduction analysis..."
-python 10_dimensionality_reduction.py \
+python analysis/dimensionality_reduction.py \
     --path_to_database "$DATABASE_PATH" \
     --path_to_labels_dir "$LABELS_PATH" \
     --path_to_features_dir "$FEATURES_PATH" \

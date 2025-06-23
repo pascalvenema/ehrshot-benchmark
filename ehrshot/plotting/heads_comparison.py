@@ -13,16 +13,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-# Add the current directory to the path to import utils
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from utils import (
-    LABELING_FUNCTION_2_PAPER_NAME, 
-    TASK_GROUP_2_PAPER_NAME,
-    TASK_GROUP_2_LABELING_FUNCTION,
-    MODEL_2_INFO,
-    HEAD_2_INFO,
-)
+try:
+    from ..utils import (
+        LABELING_FUNCTION_2_PAPER_NAME, 
+        TASK_GROUP_2_PAPER_NAME,
+        TASK_GROUP_2_LABELING_FUNCTION,
+        MODEL_2_INFO,
+        HEAD_2_INFO,
+    )
+except ImportError:
+    # Fallback for direct execution
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+    from utils import (
+        LABELING_FUNCTION_2_PAPER_NAME, 
+        TASK_GROUP_2_PAPER_NAME,
+        TASK_GROUP_2_LABELING_FUNCTION,
+        MODEL_2_INFO,
+        HEAD_2_INFO,
+    )
 
 def plot_all_heads_comparison(df_results: pd.DataFrame, 
                             score: str, 

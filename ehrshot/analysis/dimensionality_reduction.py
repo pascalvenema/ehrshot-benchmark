@@ -20,6 +20,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'dimensionality_analysis
 from reducers import get_reducer
 from evaluator import kNNEvaluator
 from plotting import create_all_plots
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 from utils import get_labels_and_features, get_patient_splits_by_idx, convert_multiclass_to_binary_labels
 from femr.labelers import load_labeled_patients
 

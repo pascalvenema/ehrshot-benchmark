@@ -1,17 +1,26 @@
 #!/bin/bash
-#SBATCH --job-name=8_make_figures
-#SBATCH --output=logs/8_make_figures_%A.out
-#SBATCH --error=logs/8_make_figures_%A.err
-#SBATCH --time=2-00:00:00
-#SBATCH --partition=normal
-#SBATCH --mem=200G
-#SBATCH --cpus-per-task=20
 
-mkdir -p ../../EHRSHOT_ASSETS/figures
+echo "🎨 Generating Essential Results Plots"
+echo "====================================="
 
-python3 ../8_make_results_plots.py \
-    --path_to_labels_and_feats_dir ../../EHRSHOT_ASSETS/benchmark \
-    --path_to_results_dir ../../EHRSHOT_ASSETS/results \
-    --path_to_output_dir ../../EHRSHOT_ASSETS/figures \
-    --model_heads "[]" \
-    --shot_strat all
+# Set default paths
+RESULTS_DIR="${RESULTS_DIR:-EHRSHOT_ASSETS/results}"
+OUTPUT_DIR="${OUTPUT_DIR:-EHRSHOT_ASSETS/figures}"
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+
+# Generate essential plots only
+echo "📊 Generating essential ClinicalBERT and embedding comparison plots..."
+
+python3 ../plotting/results_plotting.py \
+    --path_to_results_dir "$RESULTS_DIR" \
+    --path_to_output_dir "$OUTPUT_DIR"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Essential results plots generated successfully!"
+    echo "📂 Plots saved to: $OUTPUT_DIR"
+else
+    echo "❌ Plot generation failed!"
+    exit 1
+fi

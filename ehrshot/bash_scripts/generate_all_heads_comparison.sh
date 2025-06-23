@@ -1,22 +1,26 @@
 #!/bin/bash
 
-# Generate comparison plots for CLMBR vs ClinicalBERT Type 3 (clinicalbert_pool) across all prediction heads
-# This script creates a 2×3 grid showing CLMBR (top row) vs ClinicalBERT Type 3 (bottom row) across task groups
+echo "📈 Generating CLMBR vs ClinicalBERT Comparison Plots"
+echo "=================================================="
 
-# Default paths (can be overridden by command line arguments)
-results_dir="../../EHRSHOT_ASSETS/results"
-output_dir="../../EHRSHOT_ASSETS/figures"
+# Set default paths
+RESULTS_DIR="${RESULTS_DIR:-EHRSHOT_ASSETS/results}"
+OUTPUT_DIR="${OUTPUT_DIR:-EHRSHOT_ASSETS/figures}"
 
 # Create output directory
-mkdir -p "$output_dir"
+mkdir -p "$OUTPUT_DIR"
 
-# Run the Python script
-echo "🎨 Generating CLMBR vs ClinicalBERT Type 3 comparison plots with 2×3 layout..."
-python ../generate_all_heads_comparison.py \
-    --path_to_results_dir "$results_dir" \
-    --path_to_output_dir "$output_dir"
+# Generate CLMBR vs ClinicalBERT comparison plots
+echo "📊 Generating CLMBR vs ClinicalBERT Type 3 comparison across all prediction heads..."
 
-echo "✅ All plots generated and saved to: $output_dir"
-echo "📊 Check the following files:"
-echo "   - clmbr_vs_clinicalbert_type3_by_model_auroc.png"
-echo "   - clmbr_vs_clinicalbert_type3_by_model_auprc.png" 
+python3 ../plotting/heads_comparison.py \
+    --path_to_results_dir "$RESULTS_DIR" \
+    --path_to_output_dir "$OUTPUT_DIR"
+
+if [ $? -eq 0 ]; then
+    echo "✅ CLMBR vs ClinicalBERT comparison plots generated successfully!"
+    echo "📂 Plots saved to: $OUTPUT_DIR"
+else
+    echo "❌ Comparison plot generation failed!"
+    exit 1
+fi 

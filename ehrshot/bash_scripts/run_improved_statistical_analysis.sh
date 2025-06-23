@@ -22,7 +22,7 @@ mkdir -p "$OUTPUT_DIR"
 
 # Run improved statistical significance analysis
 echo "🧪 Running improved k-shot aware statistical analysis..."
-python ehrshot/improved_statistical_analysis.py \
+python ehrshot/analysis/statistical_analysis.py \
     --path_to_results_dir "$RESULTS_DIR" \
     --path_to_output_dir "$OUTPUT_DIR" \
     --alpha "$ALPHA" \
