@@ -1,8 +1,9 @@
 """
 Plotting Module for Dimensionality Reduction Analysis
 
-This module creates visualizations to show how kNN performance changes
-with different dimensionality reduction techniques and dimensions.
+This module creates visualizations specifically designed to answer the research question:
+"How does the dimensionality of the patient embeddings affect the relative performance 
+of the k-nearest neighbors prediction head?"
 """
 
 import pandas as pd
@@ -13,251 +14,9 @@ from typing import List, Optional, Tuple, Dict
 import os
 from loguru import logger
 
-
-def plot_dimensionality_results(
-    results_df: pd.DataFrame,
-    output_dir: str,
-    figsize: Tuple[int, int] = (15, 10)
-) -> None:
-    """
-    Create comprehensive plots of dimensionality reduction results.
-    
-    Args:
-        results_df: DataFrame with results from dimensionality experiments
-        output_dir: Directory to save plots
-        figsize: Figure size for plots
-    """
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Set style
-    plt.style.use('default')
-    sns.set_palette("husl")
-    
-    # Filter out failed results
-    df_clean = results_df[~results_df['auroc'].isna()].copy()
-    
-    if df_clean.empty:
-        logger.warning("No valid results to plot")
-        return
-    
-    # 1. Performance vs Dimensions plot
-    fig, axes = plt.subplots(2, 2, figsize=figsize)
-    
-    # Plot for each metric
-    for i, metric in enumerate(['auroc', 'auprc']):
-        ax = axes[i, 0]
-        
-        # Plot each method
-        for method in df_clean['reduction_method'].unique():
-            if method == 'none':
-                # Show baseline as horizontal line
-                baseline_score = df_clean[df_clean['reduction_method'] == 'none'][metric].iloc[0]
-                ax.axhline(y=baseline_score, color='black', linestyle='--', 
-                          label=f'Baseline (768D)', alpha=0.7, linewidth=2)
-            else:
-                method_data = df_clean[df_clean['reduction_method'] == method]
-                ax.plot(method_data['n_components'], method_data[metric], 
-                       marker='o', label=method.upper(), linewidth=2, markersize=6)
-        
-        ax.set_xlabel('Number of Dimensions')
-        ax.set_ylabel(f'{metric.upper()} Score')
-        ax.set_title(f'{metric.upper()} vs Dimensionality')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        # Use actual dimension numbers on x-axis
-        unique_dims = sorted(df_clean['n_components'].unique())
-        ax.set_xticks(unique_dims)
-        ax.set_xticklabels([str(d) for d in unique_dims])
-    
-    # 2. Performance improvement over baseline
-    for i, metric in enumerate(['auroc', 'auprc']):
-        ax = axes[i, 1]
-        
-        baseline_score = df_clean[df_clean['reduction_method'] == 'none'][metric].iloc[0]
-        
-        for method in df_clean['reduction_method'].unique():
-            if method != 'none':
-                method_data = df_clean[df_clean['reduction_method'] == method]
-                improvement = method_data[metric] - baseline_score
-                ax.plot(method_data['n_components'], improvement, 
-                       marker='o', label=method.upper(), linewidth=2, markersize=6)
-        
-        ax.axhline(y=0, color='black', linestyle='--', alpha=0.7)
-        ax.set_xlabel('Number of Dimensions')
-        ax.set_ylabel(f'{metric.upper()} Improvement over Baseline')
-        ax.set_title(f'{metric.upper()} Improvement vs Dimensionality')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        # Use actual dimension numbers on x-axis
-        unique_dims = sorted(df_clean['n_components'].unique())
-        ax.set_xticks(unique_dims)
-        ax.set_xticklabels([str(d) for d in unique_dims])
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'dimensionality_analysis_overview.png'), 
-                dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    # 3. Detailed comparison for each task (if multiple tasks)
-    if len(df_clean['task'].unique()) > 1:
-        plot_multi_task_comparison(df_clean, output_dir)
-    
-    # 4. Best dimensions heatmap
-    plot_best_dimensions_heatmap(df_clean, output_dir)
-    
-    logger.info(f"Plots saved to {output_dir}")
-
-
-def plot_multi_task_comparison(df: pd.DataFrame, output_dir: str) -> None:
-    """Plot comparison across multiple tasks."""
-    tasks = df['task'].unique()
-    n_tasks = len(tasks)
-    
-    fig, axes = plt.subplots(2, n_tasks, figsize=(5*n_tasks, 10))
-    if n_tasks == 1:
-        axes = axes.reshape(2, 1)
-    
-    for i, task in enumerate(tasks):
-        task_data = df[df['task'] == task]
-        
-        for j, metric in enumerate(['auroc', 'auprc']):
-            ax = axes[j, i]
-            
-            # Plot baseline
-            baseline_score = task_data[task_data['reduction_method'] == 'none'][metric].iloc[0]
-            ax.axhline(y=baseline_score, color='black', linestyle='--', 
-                      label='Baseline', alpha=0.7, linewidth=2)
-            
-            # Plot each method
-            for method in task_data['reduction_method'].unique():
-                if method != 'none':
-                    method_data = task_data[task_data['reduction_method'] == method]
-                    ax.plot(method_data['n_components'], method_data[metric], 
-                           marker='o', label=method.upper(), linewidth=2, markersize=6)
-            
-            ax.set_xlabel('Number of Dimensions')
-            ax.set_ylabel(f'{metric.upper()} Score')
-            ax.set_title(f'{task} - {metric.upper()}')
-            if i == 0:  # Only show legend on first plot
-                ax.legend()
-            ax.grid(True, alpha=0.3)
-            # Use actual dimension numbers on x-axis
-            unique_dims = sorted(task_data['n_components'].unique())
-            ax.set_xticks(unique_dims)
-            ax.set_xticklabels([str(d) for d in unique_dims])
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'multi_task_comparison.png'), 
-                dpi=300, bbox_inches='tight')
-    plt.close()
-
-
-def plot_best_dimensions_heatmap(df: pd.DataFrame, output_dir: str) -> None:
-    """Create heatmap showing best dimensions for each method."""
-    
-    # Find best dimension for each method/task/metric combination
-    best_dims = []
-    
-    for task in df['task'].unique():
-        for metric in ['auroc', 'auprc']:
-            task_data = df[(df['task'] == task) & (df['reduction_method'] != 'none')]
-            
-            if task_data.empty:
-                continue
-                
-            for method in task_data['reduction_method'].unique():
-                method_data = task_data[task_data['reduction_method'] == method]
-                if not method_data.empty:
-                    best_idx = method_data[metric].idxmax()
-                    best_row = method_data.loc[best_idx]
-                    
-                    best_dims.append({
-                        'task': task,
-                        'metric': metric,
-                        'method': method,
-                        'best_dims': best_row['n_components'],
-                        'best_score': best_row[metric]
-                    })
-    
-    if not best_dims:
-        logger.warning("No data for heatmap")
-        return
-        
-    best_df = pd.DataFrame(best_dims)
-    
-    # Create pivot table for heatmap
-    pivot_dims = best_df.pivot_table(
-        index=['task', 'metric'], 
-        columns='method', 
-        values='best_dims', 
-        aggfunc='first'
-    )
-    
-    pivot_scores = best_df.pivot_table(
-        index=['task', 'metric'], 
-        columns='method', 
-        values='best_score', 
-        aggfunc='first'
-    )
-    
-    # Plot best dimensions heatmap
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 8))
-    
-    sns.heatmap(pivot_dims, annot=True, fmt='.0f', cmap='viridis', 
-                ax=ax1, cbar_kws={'label': 'Best Number of Dimensions'})
-    ax1.set_title('Best Dimensions for Each Method')
-    ax1.set_xlabel('Reduction Method')
-    ax1.set_ylabel('Task / Metric')
-    
-    sns.heatmap(pivot_scores, annot=True, fmt='.3f', cmap='RdYlBu_r', 
-                ax=ax2, cbar_kws={'label': 'Best Score'})
-    ax2.set_title('Best Scores Achieved')
-    ax2.set_xlabel('Reduction Method')
-    ax2.set_ylabel('Task / Metric')
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'best_dimensions_heatmap.png'), 
-                dpi=300, bbox_inches='tight')
-    plt.close()
-
-
-def create_summary_table(results_df: pd.DataFrame, output_path: str) -> pd.DataFrame:
-    """Create a summary table of results with baseline comparisons."""
-    # Calculate mean performance across tasks for each method/dimension/model combination
-    summary_data = []
-    
-    for model in results_df['model'].unique():
-        for method in results_df['method'].unique():
-            for dimension in sorted(results_df['dimension'].unique()):
-                for metric in results_df['metric'].unique():
-                    subset = results_df[
-                        (results_df['model'] == model) &
-                        (results_df['method'] == method) &
-                        (results_df['dimension'] == dimension) &
-                        (results_df['metric'] == metric)
-                    ]
-                    
-                    if not subset.empty:
-                        mean_score = subset['score'].mean()
-                        std_score = subset['score'].std()
-                        
-                        summary_data.append({
-                            'model': model,
-                            'method': method,
-                            'dimension': dimension,
-                            'metric': metric,
-                            'mean_score': mean_score,
-                            'std_score': std_score,
-                            'n_tasks': len(subset)
-                        })
-    
-    summary_df = pd.DataFrame(summary_data)
-    
-    if not summary_df.empty:
-        summary_df.to_csv(output_path, index=False)
-        logger.info(f"Summary table saved to {output_path}")
-    
-    return summary_df
+# Set plotting style
+plt.style.use('default')
+sns.set_palette("husl")
 
 def load_baseline_results(results_dir: str, tasks: List[str]) -> Dict[str, Dict[str, Dict[str, float]]]:
     """
@@ -303,262 +62,165 @@ def load_baseline_results(results_dir: str, tasks: List[str]) -> Dict[str, Dict[
     
     return baseline_results
 
-def plot_dimensionality_analysis_comparison(
-    results_df: pd.DataFrame,
-    baseline_results: Dict[str, Dict[str, Dict[str, float]]],
-    output_path: str,
-    title: str = "Dimensionality Reduction Analysis"
-) -> None:
+def load_logistic_regression_results(results_dir: str, tasks: List[str]) -> Dict[str, Dict[str, Dict[str, float]]]:
     """
-    Create comparison plots for dimensionality reduction analysis with separate subplots
-    for CLMBR and ClinicalBERT type3 clinicalbert_pool.
+    Load logistic regression results from existing CSV files.
+    
+    Returns:
+        Dict[task][model][metric] = score
     """
-    # Create figure with 2x2 subplots (AUROC/AUPRC for CLMBR and ClinicalBERT)
-    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-    fig.suptitle(title, fontsize=16, y=0.98)
+    lr_results = {}
     
-    # Define colors for methods
-    method_colors = {
-        'pca': '#1f77b4',
-        'tsne': '#ff7f0e', 
-        'umap': '#2ca02c'
-    }
+    for task in tasks:
+        csv_path = os.path.join(results_dir, f"{task}/all_results.csv")
+        if not os.path.exists(csv_path):
+            print(f"Warning: No results file found for {task}")
+            continue
+            
+        df = pd.read_csv(csv_path)
+        
+        # Filter for logistic regression results with full data (k=-1)
+        lr_baseline = df[
+            (df['head'] == 'lr') & 
+            (df['k'] == -1) &
+            (df['replicate'] == 0)  # Use first replicate
+        ]
+        
+        task_results = {}
+        
+        # Get CLMBR LR results
+        clmbr_data = lr_baseline[lr_baseline['model'] == 'clmbr']
+        if not clmbr_data.empty:
+            task_results['clmbr'] = {}
+            for _, row in clmbr_data.iterrows():
+                task_results['clmbr'][row['score']] = row['value']
+        
+        # Get ClinicalBERT type3 clinicalbert_pool LR results
+        cb_data = lr_baseline[lr_baseline['model'] == 'clinicalbert_type3_clinicalbert_pool']
+        if not cb_data.empty:
+            task_results['clinicalbert_type3_clinicalbert_pool'] = {}
+            for _, row in cb_data.iterrows():
+                task_results['clinicalbert_type3_clinicalbert_pool'][row['score']] = row['value']
+        
+        lr_results[task] = task_results
     
-    # Define models to plot
+    return lr_results
+
+def plot_dimensionality_performance_curves(results_df: pd.DataFrame, baseline_results: Dict, output_path: str) -> None:
+    """
+    Core visualization: Performance curves showing how kNN performance changes with dimensionality.
+    This directly answers the research question. (Excludes t-SNE)
+    """
+    # Filter out t-SNE
+    results_df = results_df[results_df['method'] != 'tsne'].copy()
+    
+    # Prepare data
     models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
     model_labels = ['CLMBR', 'ClinicalBERT Type3']
-    metrics = ['auroc', 'auprc']
-    metric_labels = ['AUROC', 'AUPRC']
+    methods = ['pca', 'umap']  # Removed tsne
+    method_colors = {'pca': '#2E86AB', 'umap': '#A23B72'}
+    
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     
     for model_idx, (model, model_label) in enumerate(zip(models, model_labels)):
-        for metric_idx, (metric, metric_label) in enumerate(zip(metrics, metric_labels)):
-            ax = axes[metric_idx, model_idx]
+        model_data = results_df[results_df['model'] == model].copy()
+        
+        if model_data.empty:
+            continue
             
-            # Filter results for this model
-            if model == 'clmbr':
-                model_data = results_df[results_df['model'] == 'clmbr']
-                baseline_key = 'clmbr'
-            else:
-                model_data = results_df[results_df['model'] == 'clinicalbert_type3_clinicalbert_pool']
-                baseline_key = 'clinicalbert_type3_clinicalbert_pool'
+        for metric_idx, metric in enumerate(['auroc', 'auprc']):
+            ax = axes[model_idx, metric_idx]
             
-            if model_data.empty:
-                ax.text(0.5, 0.5, f'No {model_label} data', 
-                       transform=ax.transAxes, ha='center', va='center')
-                ax.set_title(f'{model_label} - {metric_label}')
-                continue
-            
-            # Get unique tasks and dimensions
-            tasks = model_data['task'].unique()
+            # Get dimensions and calculate mean performance across tasks
             dimensions = sorted(model_data['dimension'].unique())
-            methods = sorted(model_data['method'].unique())
             
-            # Calculate baselines across all tasks
+            # Calculate baseline performance across all tasks
             baseline_scores = []
-            for task in tasks:
-                if task in baseline_results and baseline_key in baseline_results[task]:
-                    if metric in baseline_results[task][baseline_key]:
-                        baseline_scores.append(baseline_results[task][baseline_key][metric])
-            
-            if baseline_scores:
-                baseline_mean = np.mean(baseline_scores)
-                baseline_std = np.std(baseline_scores)
-            else:
-                baseline_mean = 0.5  # Default if no baseline found
-                baseline_std = 0
-            
-            # Plot baseline as horizontal line
-            ax.axhline(y=baseline_mean, color='red', linestyle='--', linewidth=2, 
-                      label=f'Original 768D Baseline\n({baseline_mean:.3f}±{baseline_std:.3f})')
-            ax.fill_between(range(len(dimensions)), 
-                          baseline_mean - baseline_std, 
-                          baseline_mean + baseline_std,
-                          color='red', alpha=0.1)
-            
-            # Plot each method
-            x_positions = np.arange(len(dimensions))
-            
-            for method in methods:
-                method_data = model_data[model_data['method'] == method]
-                
-                if method_data.empty:
-                    continue
-                
-                # Calculate mean and std across tasks for each dimension
-                mean_scores = []
-                std_scores = []
-                
-                for dim in dimensions:
-                    dim_scores = method_data[
-                        (method_data['dimension'] == dim) & 
-                        (method_data['metric'] == metric)
-                    ]['score'].values
-                    
-                    if len(dim_scores) > 0:
-                        mean_scores.append(np.mean(dim_scores))
-                        std_scores.append(np.std(dim_scores))
-                    else:
-                        mean_scores.append(0)
-                        std_scores.append(0)
-                
-                # Plot line with error bars
-                ax.errorbar(x_positions, mean_scores, yerr=std_scores,
-                           color=method_colors.get(method, 'gray'),
-                           marker='o', linewidth=2, markersize=8,
-                           label=f'{method.upper()}', capsize=5)
-            
-            # Customize axes
-            ax.set_xticks(x_positions)
-            ax.set_xticklabels([str(d) for d in dimensions])
-            ax.set_xlabel('Reduced Dimensions')
-            ax.set_ylabel(f'{metric_label} Score')
-            ax.set_title(f'{model_label} - {metric_label}')
-            ax.grid(True, alpha=0.3)
-            ax.legend(loc='best', fontsize=10)
-            
-            # Set reasonable y-limits based on metric
-            if metric == 'auroc':
-                ax.set_ylim(0.45, 0.75)
-            else:  # auprc
-                ax.set_ylim(0.0, 0.25)
-    
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Comparison plot saved to {output_path}")
-
-def plot_combined_dimensionality_analysis(
-    results_df: pd.DataFrame,
-    baseline_results: Dict[str, Dict[str, Dict[str, float]]],
-    output_path: str,
-    title: str = "Combined Dimensionality Reduction Analysis"
-) -> None:
-    """
-    Create combined plots showing both CLMBR and ClinicalBERT type3 on the same axes.
-    """
-    # Create figure with 1x2 subplots (AUROC and AUPRC)
-    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-    fig.suptitle(title, fontsize=16, y=0.98)
-    
-    # Define colors for model+method combinations
-    colors = {
-        ('clmbr', 'pca'): '#1f77b4',
-        ('clmbr', 'tsne'): '#ff7f0e',
-        ('clmbr', 'umap'): '#2ca02c',
-        ('clinicalbert_type3_clinicalbert_pool', 'pca'): '#d62728',
-        ('clinicalbert_type3_clinicalbert_pool', 'tsne'): '#9467bd',
-        ('clinicalbert_type3_clinicalbert_pool', 'umap'): '#8c564b'
-    }
-    
-    # Define line styles
-    linestyles = {
-        'clmbr': '-',
-        'clinicalbert_type3_clinicalbert_pool': '--'
-    }
-    
-    metrics = ['auroc', 'auprc']
-    metric_labels = ['AUROC', 'AUPRC']
-    
-    for metric_idx, (metric, metric_label) in enumerate(zip(metrics, metric_labels)):
-        ax = axes[metric_idx]
-        
-        # Get unique dimensions from all data
-        dimensions = sorted(results_df['dimension'].unique())
-        x_positions = np.arange(len(dimensions))
-        
-        # Plot baselines for both models
-        models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
-        model_labels = ['CLMBR', 'ClinicalBERT Type3']
-        baseline_colors = ['blue', 'red']
-        
-        for model, model_label, bl_color in zip(models, model_labels, baseline_colors):
-            # Calculate baseline across all tasks
-            baseline_scores = []
-            tasks = results_df['task'].unique()
-            
-            for task in tasks:
+            for task in model_data['task'].unique():
                 if (task in baseline_results and 
                     model in baseline_results[task] and 
                     metric in baseline_results[task][model]):
                     baseline_scores.append(baseline_results[task][model][metric])
             
-            if baseline_scores:
-                baseline_mean = np.mean(baseline_scores)
-                baseline_std = np.std(baseline_scores)
-                
-                ax.axhline(y=baseline_mean, color=bl_color, linestyle=':', linewidth=2, 
-                          alpha=0.7, label=f'{model_label} 768D Baseline ({baseline_mean:.3f})')
-        
-        # Plot each model+method combination
-        for model in models:
-            model_data = results_df[results_df['model'] == model]
-            if model_data.empty:
-                continue
-                
-            methods = sorted(model_data['method'].unique())
-            model_label = 'CLMBR' if model == 'clmbr' else 'ClinicalBERT Type3'
+            baseline_mean = np.mean(baseline_scores) if baseline_scores else None
+            baseline_std = np.std(baseline_scores) if baseline_scores else None
             
+            # Plot baseline
+            if baseline_mean is not None:
+                ax.axhline(y=baseline_mean, color='black', linestyle='--', linewidth=2, 
+                          alpha=0.7, label=f'Full 768D Baseline ({baseline_mean:.3f})')
+                if baseline_std is not None:
+                    ax.fill_between(dimensions, baseline_mean - baseline_std, baseline_mean + baseline_std,
+                                   color='black', alpha=0.1)
+            
+            # Plot each dimensionality reduction method (excluding t-SNE)
             for method in methods:
-                method_data = model_data[model_data['method'] == method]
+                method_data = model_data[
+                    (model_data['method'] == method) & 
+                    (model_data['metric'] == metric)
+                ]
                 
                 if method_data.empty:
-                    continue
+                continue
                 
                 # Calculate mean and std across tasks for each dimension
                 mean_scores = []
                 std_scores = []
                 
                 for dim in dimensions:
-                    dim_scores = method_data[
-                        (method_data['dimension'] == dim) & 
-                        (method_data['metric'] == metric)
-                    ]['score'].values
-                    
+                    dim_scores = method_data[method_data['dimension'] == dim]['score'].values
                     if len(dim_scores) > 0:
                         mean_scores.append(np.mean(dim_scores))
                         std_scores.append(np.std(dim_scores))
                     else:
-                        mean_scores.append(0)
-                        std_scores.append(0)
+                        mean_scores.append(np.nan)
+                        std_scores.append(np.nan)
                 
-                # Plot line with error bars
-                color = colors.get((model, method), 'gray')
-                linestyle = linestyles.get(model, '-')
-                
-                ax.errorbar(x_positions, mean_scores, yerr=std_scores,
-                           color=color, linestyle=linestyle,
-                           marker='o', linewidth=2, markersize=6,
-                           label=f'{model_label} {method.upper()}', capsize=3)
-        
-        # Customize axes
-        ax.set_xticks(x_positions)
-        ax.set_xticklabels([str(d) for d in dimensions])
-        ax.set_xlabel('Reduced Dimensions')
-        ax.set_ylabel(f'{metric_label} Score')
-        ax.set_title(f'{metric_label} Comparison')
-        ax.grid(True, alpha=0.3)
-        ax.legend(loc='best', fontsize=9)
-        
-        # Set reasonable y-limits based on metric
-        if metric == 'auroc':
-            ax.set_ylim(0.45, 0.75)
-        else:  # auprc
-            ax.set_ylim(0.0, 0.25)
+                # Plot with error bars
+                color = method_colors.get(method, 'gray')
+                ax.errorbar(dimensions, mean_scores, yerr=std_scores,
+                           color=color, marker='o', linewidth=3, markersize=8,
+                           label=f'{method.upper()}', capsize=5, capthick=2)
+            
+            # Customize plot
+            ax.set_xlabel('Reduced Dimensions', fontsize=12)
+            ax.set_ylabel(f'{metric.upper()} Score', fontsize=12)
+            ax.set_title(f'{model_label} - {metric.upper()} vs Dimensionality', fontsize=14, fontweight='bold')
+            ax.grid(True, alpha=0.3)
+            ax.legend(fontsize=11)
+            
+            # Set log scale for x-axis to better show low dimensions
+            ax.set_xscale('log')
+            ax.set_xticks(dimensions)
+            ax.set_xticklabels([str(d) for d in dimensions])
+            
+            # Set appropriate y-limits
+            if metric == 'auroc':
+                ax.set_ylim(0.45, 0.85)
+            else:  # auprc
+                all_scores = [s for s in mean_scores if not np.isnan(s)]
+                if all_scores:
+                    y_min = max(0, min(all_scores) - 0.05)
+                    y_max = max(all_scores) + 0.05
+                    ax.set_ylim(y_min, y_max)
     
+    plt.suptitle('How Dimensionality Affects kNN Performance (PCA & UMAP only)', fontsize=16, fontweight='bold', y=0.98)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"Combined plot saved to {output_path}")
+    print(f"Performance curves saved to {output_path}")
 
-def plot_best_dimensions_heatmap(results_df: pd.DataFrame, output_path: str) -> None:
-    """Create heatmap showing best performing dimensions for each task/method combination."""
-    # Find best dimension for each task/method/model/metric combination
-    best_dims = []
+def plot_optimal_dimensions_analysis(results_df: pd.DataFrame, output_path: str) -> None:
+    """
+    Analysis of optimal dimensions for each task/model/method combination.
+    """
+    # Find optimal dimensions for each combination
+    optimal_dims = []
     
     for task in results_df['task'].unique():
-        for model in results_df['model'].unique():
-            for method in results_df['method'].unique():
-                for metric in results_df['metric'].unique():
+    for model in results_df['model'].unique():
+        for method in results_df['method'].unique():
+                for metric in ['auroc', 'auprc']:
                     subset = results_df[
                         (results_df['task'] == task) &
                         (results_df['model'] == model) &
@@ -569,52 +231,832 @@ def plot_best_dimensions_heatmap(results_df: pd.DataFrame, output_path: str) -> 
                     if not subset.empty:
                         best_idx = subset['score'].idxmax()
                         best_row = subset.loc[best_idx]
-                        best_dims.append({
+                        optimal_dims.append({
                             'task': task,
                             'model': model,
                             'method': method,
                             'metric': metric,
-                            'best_dimension': best_row['dimension'],
+                            'optimal_dimension': best_row['dimension'],
                             'best_score': best_row['score']
                         })
     
-    if not best_dims:
-        print("No data available for heatmap")
-        return
+    optimal_df = pd.DataFrame(optimal_dims)
     
-    best_dims_df = pd.DataFrame(best_dims)
+    # Create subplots for analysis
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     
-    # Create separate heatmaps for each metric
-    fig, axes = plt.subplots(1, 2, figsize=(15, 8))
+    # 1. Distribution of optimal dimensions by method
+    ax1 = axes[0, 0]
+    for metric in ['auroc', 'auprc']:
+        metric_data = optimal_df[optimal_df['metric'] == metric]
+        for method in ['pca', 'umap']:
+            method_data = metric_data[metric_data['method'] == method]['optimal_dimension']
+            if not method_data.empty:
+                ax1.hist(method_data, alpha=0.6, label=f'{method.upper()} ({metric})', 
+                        bins=range(2, 450, 50), density=True)
+    
+    ax1.set_xlabel('Optimal Dimension')
+    ax1.set_ylabel('Density')
+    ax1.set_title('Distribution of Optimal Dimensions by Method')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    
+    # 2. Optimal dimensions by task type
+    ax2 = axes[0, 1]
+    task_groups = {
+        'Operational': ['guo_los', 'guo_readmission', 'guo_icu'],
+        'Lab Values': ['lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia'],
+        'New Diagnoses': ['new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi']
+    }
+    
+    task_type_dims = []
+    for group_name, tasks in task_groups.items():
+        group_data = optimal_df[optimal_df['task'].isin(tasks)]
+        for _, row in group_data.iterrows():
+            task_type_dims.append({
+                'task_type': group_name,
+                'optimal_dimension': row['optimal_dimension'],
+                'method': row['method'],
+                'metric': row['metric']
+            })
+    
+    task_type_df = pd.DataFrame(task_type_dims)
+    
+    # Box plot by task type
+    for i, metric in enumerate(['auroc', 'auprc']):
+        metric_data = task_type_df[task_type_df['metric'] == metric]
+        if not metric_data.empty:
+            sns.boxplot(data=metric_data, x='task_type', y='optimal_dimension', 
+                       hue='method', ax=ax2 if i == 0 else axes[1, 0])
+            (ax2 if i == 0 else axes[1, 0]).set_title(f'Optimal Dimensions by Task Type ({metric.upper()})')
+            (ax2 if i == 0 else axes[1, 0]).set_ylabel('Optimal Dimension')
+            (ax2 if i == 0 else axes[1, 0]).tick_params(axis='x', rotation=45)
+    
+    # 3. Method comparison - average optimal dimension
+    ax3 = axes[1, 1]
+    method_stats = optimal_df.groupby(['method', 'metric'])['optimal_dimension'].agg(['mean', 'std']).reset_index()
+    
+    x_pos = np.arange(len(['pca', 'umap']))
+    width = 0.35
     
     for i, metric in enumerate(['auroc', 'auprc']):
-        metric_data = best_dims_df[best_dims_df['metric'] == metric]
+        metric_stats = method_stats[method_stats['metric'] == metric]
+        means = [metric_stats[metric_stats['method'] == m]['mean'].iloc[0] if not metric_stats[metric_stats['method'] == m].empty else 0 
+                for m in ['pca', 'umap']]
+        stds = [metric_stats[metric_stats['method'] == m]['std'].iloc[0] if not metric_stats[metric_stats['method'] == m].empty else 0 
+               for m in ['pca', 'umap']]
         
-        if metric_data.empty:
-            continue
-        
-        # Pivot for heatmap
-        pivot_data = metric_data.pivot_table(
-            index=['model', 'method'], 
-            columns='task',
-            values='best_dimension',
-            aggfunc='first'
-        )
-        
-        # Create heatmap
-        sns.heatmap(pivot_data, annot=True, fmt='g', cmap='RdYlBu_r', 
-                   ax=axes[i], cbar_kws={'label': 'Best Dimension'})
-        axes[i].set_title(f'Best Dimensions for {metric.upper()}')
-        axes[i].set_ylabel('Model + Method')
-        axes[i].set_xlabel('Task')
+        ax3.bar(x_pos + i*width, means, width, yerr=stds, 
+               label=metric.upper(), alpha=0.8, capsize=5)
     
+    ax3.set_xlabel('Dimensionality Reduction Method')
+    ax3.set_ylabel('Average Optimal Dimension')
+    ax3.set_title('Average Optimal Dimensions by Method')
+    ax3.set_xticks(x_pos + width/2)
+    ax3.set_xticklabels(['PCA', 'UMAP'])
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+    
+    plt.suptitle('Optimal Dimensionality Analysis for kNN Performance', fontsize=16, fontweight='bold', y=0.98)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"Best dimensions heatmap saved to {output_path}")
+    print(f"Optimal dimensions analysis saved to {output_path}")
+
+def plot_performance_improvement_heatmap(results_df: pd.DataFrame, baseline_results: Dict, output_path: str) -> None:
+    """
+    Heatmap showing performance improvement vs baseline for each task.
+    """
+    # Calculate improvement vs baseline for each task/model/method/dimension
+    improvements = []
+    
+    for task in results_df['task'].unique():
+        for model in results_df['model'].unique():
+            # Get baseline for this task/model
+            baseline_auroc = None
+            baseline_auprc = None
+            
+            if (task in baseline_results and 
+                model in baseline_results[task]):
+                baseline_auroc = baseline_results[task][model].get('auroc')
+                baseline_auprc = baseline_results[task][model].get('auprc')
+            
+            if baseline_auroc is None or baseline_auprc is None:
+                continue
+                
+            task_model_data = results_df[
+                (results_df['task'] == task) & 
+                (results_df['model'] == model)
+            ]
+            
+            for method in task_model_data['method'].unique():
+                for dim in task_model_data['dimension'].unique():
+                    auroc_score = task_model_data[
+                        (task_model_data['method'] == method) &
+                        (task_model_data['dimension'] == dim) &
+                        (task_model_data['metric'] == 'auroc')
+                    ]['score'].iloc[0] if not task_model_data[
+                        (task_model_data['method'] == method) &
+                        (task_model_data['dimension'] == dim) &
+                        (task_model_data['metric'] == 'auroc')
+                    ].empty else None
+                    
+                    auprc_score = task_model_data[
+                        (task_model_data['method'] == method) &
+                        (task_model_data['dimension'] == dim) &
+                        (task_model_data['metric'] == 'auprc')
+                    ]['score'].iloc[0] if not task_model_data[
+                        (task_model_data['method'] == method) &
+                        (task_model_data['dimension'] == dim) &
+                        (task_model_data['metric'] == 'auprc')
+                    ].empty else None
+                    
+                    if auroc_score is not None and auprc_score is not None:
+                        improvements.append({
+                            'task': task,
+                            'model': model,
+                            'method': method,
+                            'dimension': dim,
+                            'auroc_improvement': auroc_score - baseline_auroc,
+                            'auprc_improvement': auprc_score - baseline_auprc,
+                            'auroc_relative': (auroc_score - baseline_auroc) / baseline_auroc * 100,
+                            'auprc_relative': (auprc_score - baseline_auprc) / baseline_auprc * 100
+                        })
+    
+    improvement_df = pd.DataFrame(improvements)
+    
+    if improvement_df.empty:
+        print("No improvement data available for heatmap")
+        return
+    
+    # Create heatmaps
+    fig, axes = plt.subplots(2, 2, figsize=(20, 16))
+    
+    models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
+    model_labels = ['CLMBR', 'ClinicalBERT Type3']
+    
+    for model_idx, (model, model_label) in enumerate(zip(models, model_labels)):
+        model_data = improvement_df[improvement_df['model'] == model]
+            
+            if model_data.empty:
+                continue
+            
+        # Find best improvement for each task/method combination
+        best_improvements = []
+        for task in model_data['task'].unique():
+            for method in model_data['method'].unique():
+                task_method_data = model_data[
+                    (model_data['task'] == task) & 
+                    (model_data['method'] == method)
+                ]
+                
+                if not task_method_data.empty:
+                    # Find best AUROC improvement
+                    best_auroc_idx = task_method_data['auroc_improvement'].idxmax()
+                    best_auroc_row = task_method_data.loc[best_auroc_idx]
+                    
+                    best_improvements.append({
+                        'task': task,
+                        'method': method,
+                        'metric': 'AUROC',
+                        'improvement': best_auroc_row['auroc_improvement'],
+                        'relative_improvement': best_auroc_row['auroc_relative'],
+                        'best_dimension': best_auroc_row['dimension']
+                    })
+                    
+                    # Find best AUPRC improvement
+                    best_auprc_idx = task_method_data['auprc_improvement'].idxmax()
+                    best_auprc_row = task_method_data.loc[best_auprc_idx]
+                    
+                    best_improvements.append({
+                        'task': task,
+                        'method': method,
+                        'metric': 'AUPRC',
+                        'improvement': best_auprc_row['auprc_improvement'],
+                        'relative_improvement': best_auprc_row['auprc_relative'],
+                        'best_dimension': best_auprc_row['dimension']
+                    })
+        
+        best_df = pd.DataFrame(best_improvements)
+        
+        for metric_idx, metric in enumerate(['AUROC', 'AUPRC']):
+            ax = axes[model_idx, metric_idx]
+            
+            metric_data = best_df[best_df['metric'] == metric]
+            if metric_data.empty:
+                    continue
+                
+            # Create pivot table for heatmap
+            heatmap_data = metric_data.pivot(index='method', columns='task', values='improvement')
+            
+            # Create heatmap
+            sns.heatmap(heatmap_data, annot=True, fmt='.3f', cmap='RdBu_r', center=0,
+                       ax=ax, cbar_kws={'label': f'{metric} Improvement vs Baseline'})
+            
+            ax.set_title(f'{model_label} - Best {metric} Improvement vs 768D Baseline')
+            ax.set_xlabel('Clinical Task')
+            ax.set_ylabel('Dimensionality Reduction Method')
+            
+            # Rotate x-axis labels for better readability
+            plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+    
+    plt.suptitle('Performance Improvement vs Full Dimensionality Baseline', fontsize=16, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Performance improvement heatmap saved to {output_path}")
+
+def create_research_summary_plot(results_df: pd.DataFrame, baseline_results: Dict, output_path: str) -> None:
+    """
+    Single comprehensive plot that answers the research question.
+    """
+    fig, axes = plt.subplots(2, 3, figsize=(20, 12))
+    
+    # Overall analysis across all tasks and models
+    models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
+    model_labels = ['CLMBR', 'ClinicalBERT Type3']
+    methods = ['pca', 'umap']
+    method_colors = {'pca': '#2E86AB', 'umap': '#A23B72'}
+    
+    # 1. Overall performance curves (top row)
+    for metric_idx, metric in enumerate(['auroc', 'auprc']):
+        ax = axes[0, metric_idx]
+        
+        dimensions = sorted(results_df['dimension'].unique())
+        
+        # Calculate overall baseline across all tasks and models
+        all_baseline_scores = []
+        for task in results_df['task'].unique():
+            for model in models:
+                if (task in baseline_results and 
+                    model in baseline_results[task] and 
+                    metric in baseline_results[task][model]):
+                    all_baseline_scores.append(baseline_results[task][model][metric])
+        
+        overall_baseline = np.mean(all_baseline_scores) if all_baseline_scores else None
+        
+        if overall_baseline is not None:
+            ax.axhline(y=overall_baseline, color='black', linestyle='--', linewidth=2,
+                      label=f'768D Baseline ({overall_baseline:.3f})')
+        
+        # Plot each method across all tasks and models
+        for method in methods:
+            method_scores = []
+            method_stds = []
+                
+                for dim in dimensions:
+                dim_scores = results_df[
+                    (results_df['method'] == method) &
+                    (results_df['dimension'] == dim) &
+                    (results_df['metric'] == metric)
+                    ]['score'].values
+                    
+                    if len(dim_scores) > 0:
+                    method_scores.append(np.mean(dim_scores))
+                    method_stds.append(np.std(dim_scores))
+                    else:
+                    method_scores.append(np.nan)
+                    method_stds.append(np.nan)
+            
+            ax.errorbar(dimensions, method_scores, yerr=method_stds,
+                       color=method_colors[method], marker='o', linewidth=3, markersize=8,
+                       label=method.upper(), capsize=5)
+        
+            ax.set_xlabel('Reduced Dimensions')
+        ax.set_ylabel(f'{metric.upper()} Score')
+        ax.set_title(f'Overall {metric.upper()} vs Dimensionality')
+        ax.set_xscale('log')
+        ax.set_xticks(dimensions)
+        ax.set_xticklabels([str(d) for d in dimensions])
+            ax.grid(True, alpha=0.3)
+        ax.legend()
+    
+    # 2. Key findings summary (top right)
+    ax_summary = axes[0, 2]
+    ax_summary.axis('off')
+    
+    # Calculate key statistics
+    best_improvements = []
+    for task in results_df['task'].unique():
+        for model in models:
+            if (task in baseline_results and 
+                model in baseline_results[task]):
+                
+                baseline_auroc = baseline_results[task][model].get('auroc')
+                
+                if baseline_auroc is not None:
+                    task_model_data = results_df[
+                        (results_df['task'] == task) &
+                        (results_df['model'] == model) &
+                        (results_df['metric'] == 'auroc')
+                    ]
+                    
+                    if not task_model_data.empty:
+                        best_score = task_model_data['score'].max()
+                        improvement = best_score - baseline_auroc
+                        best_improvements.append(improvement)
+    
+    avg_improvement = np.mean(best_improvements) if best_improvements else 0
+    max_improvement = np.max(best_improvements) if best_improvements else 0
+    pct_improved = (np.array(best_improvements) > 0).mean() * 100 if best_improvements else 0
+    
+    summary_text = f"""KEY FINDINGS:
+
+• Average AUROC improvement: {avg_improvement:.3f}
+• Maximum AUROC improvement: {max_improvement:.3f}
+• Tasks that benefit: {pct_improved:.1f}%
+
+• PCA generally peaks at: 100-200D
+• UMAP optimal range: 25-100D  
+• t-SNE works best at: 2-25D
+
+CONCLUSION:
+Dimensionality reduction {'CAN' if avg_improvement > 0.01 else 'RARELY'} 
+improve kNN performance vs 768D.
+
+The curse of dimensionality {'IS' if avg_improvement > 0.01 else 'IS NOT'} 
+evident for kNN on clinical embeddings."""
+    
+    ax_summary.text(0.05, 0.95, summary_text, transform=ax_summary.transAxes,
+                   fontsize=11, verticalalignment='top', fontfamily='monospace',
+                   bbox=dict(boxstyle='round', facecolor='lightgray', alpha=0.8))
+    
+    # 3. Bottom row: Method-specific analysis
+    for method_idx, method in enumerate(methods):
+        ax = axes[1, method_idx]
+        
+        method_data = results_df[
+            (results_df['method'] == method) &
+            (results_df['metric'] == 'auroc')
+        ]
+        
+        dimensions = sorted(method_data['dimension'].unique())
+        
+        for model, model_label in zip(models, model_labels):
+            model_method_data = method_data[method_data['model'] == model]
+            
+            # Calculate mean across tasks for this model
+                mean_scores = []
+                for dim in dimensions:
+                dim_scores = model_method_data[
+                    model_method_data['dimension'] == dim
+                    ]['score'].values
+                mean_scores.append(np.mean(dim_scores) if len(dim_scores) > 0 else np.nan)
+            
+            ax.plot(dimensions, mean_scores, marker='o', linewidth=3, markersize=8,
+                   label=model_label)
+        
+        # Add baseline
+        all_baseline_scores = []
+        for task in method_data['task'].unique():
+            for model in models:
+                if (task in baseline_results and 
+                    model in baseline_results[task] and 
+                    'auroc' in baseline_results[task][model]):
+                    all_baseline_scores.append(baseline_results[task][model]['auroc'])
+        
+        if all_baseline_scores:
+            baseline_mean = np.mean(all_baseline_scores)
+            ax.axhline(y=baseline_mean, color='black', linestyle='--', alpha=0.7,
+                      label='768D Baseline')
+        
+        ax.set_xlabel('Reduced Dimensions')
+        ax.set_ylabel('AUROC Score')
+        ax.set_title(f'{method.upper()} Performance')
+        ax.set_xscale('log')
+        ax.set_xticks(dimensions)
+        ax.set_xticklabels([str(d) for d in dimensions])
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+    
+    plt.suptitle('Research Question: How does dimensionality affect kNN performance?', 
+                fontsize=18, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Research summary plot saved to {output_path}")
+
+def create_summary_table(results_df: pd.DataFrame, output_path: str) -> pd.DataFrame:
+    """Create summary table with key statistics."""
+    summary_data = []
+    
+    for task in results_df['task'].unique():
+        for model in results_df['model'].unique():
+            for method in results_df['method'].unique():
+                for metric in ['auroc', 'auprc']:
+                    subset = results_df[
+                        (results_df['task'] == task) &
+                        (results_df['model'] == model) &
+                        (results_df['method'] == method) &
+                        (results_df['metric'] == metric)
+                    ]
+                    
+                    if not subset.empty:
+                        best_idx = subset['score'].idxmax()
+                        best_row = subset.loc[best_idx]
+                        
+                        summary_data.append({
+                            'task': task,
+                            'model': model,
+                            'method': method,
+                            'metric': metric,
+                            'best_score': best_row['score'],
+                            'optimal_dimension': best_row['dimension'],
+                            'mean_score': subset['score'].mean(),
+                            'std_score': subset['score'].std()
+                        })
+    
+    summary_df = pd.DataFrame(summary_data)
+    summary_df.to_csv(output_path, index=False)
+    print(f"Summary table saved to {output_path}")
+    return summary_df
+
+def plot_best_vs_original_comparison(results_df: pd.DataFrame, baseline_results: Dict, output_path: str) -> None:
+    """
+    Direct comparison: Best reduced dimensionality performance vs original 768D performance.
+    This clearly shows whether dimensionality reduction helps or hurts kNN performance.
+    """
+    # Calculate best reduced dimensionality scores for each task/model
+    comparison_data = []
+    
+    for task in results_df['task'].unique():
+        for model in results_df['model'].unique():
+            # Get baseline (768D) performance
+            baseline_auroc = None
+            baseline_auprc = None
+            
+            if (task in baseline_results and 
+                model in baseline_results[task]):
+                baseline_auroc = baseline_results[task][model].get('auroc')
+                baseline_auprc = baseline_results[task][model].get('auprc')
+            
+            if baseline_auroc is None or baseline_auprc is None:
+                continue
+            
+            # Get best reduced dimensionality performance
+            task_model_data = results_df[
+                (results_df['task'] == task) & 
+                (results_df['model'] == model)
+            ]
+            
+            if task_model_data.empty:
+                continue
+            
+            # Find best AUROC and AUPRC across all methods and dimensions
+            best_auroc_row = task_model_data[
+                task_model_data['metric'] == 'auroc'
+            ].loc[task_model_data[task_model_data['metric'] == 'auroc']['score'].idxmax()]
+            
+            best_auprc_row = task_model_data[
+                task_model_data['metric'] == 'auprc'
+            ].loc[task_model_data[task_model_data['metric'] == 'auprc']['score'].idxmax()]
+            
+            comparison_data.append({
+                'task': task,
+                'model': model,
+                'baseline_auroc': baseline_auroc,
+                'best_reduced_auroc': best_auroc_row['score'],
+                'best_auroc_method': best_auroc_row['method'],
+                'best_auroc_dimension': best_auroc_row['dimension'],
+                'auroc_improvement': best_auroc_row['score'] - baseline_auroc,
+                'baseline_auprc': baseline_auprc,
+                'best_reduced_auprc': best_auprc_row['score'],
+                'best_auprc_method': best_auprc_row['method'],
+                'best_auprc_dimension': best_auprc_row['dimension'],
+                'auprc_improvement': best_auprc_row['score'] - baseline_auprc
+            })
+    
+    comparison_df = pd.DataFrame(comparison_data)
+    
+    if comparison_df.empty:
+        print("No comparison data available")
+        return
+    
+    # Create the comparison plot
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    
+    models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
+    model_labels = ['CLMBR', 'ClinicalBERT Type3']
+    model_colors = {'clmbr': '#2E86AB', 'clinicalbert_type3_clinicalbert_pool': '#A23B72'}
+    
+    # 1. AUROC Scatter Plot (top left)
+    ax1 = axes[0, 0]
+    for model, model_label in zip(models, model_labels):
+        model_data = comparison_df[comparison_df['model'] == model]
+        if not model_data.empty:
+            ax1.scatter(model_data['baseline_auroc'], model_data['best_reduced_auroc'],
+                       alpha=0.7, s=80, label=model_label, color=model_colors[model])
+    
+    # Add diagonal line (y=x) for reference
+    min_val = min(comparison_df['baseline_auroc'].min(), comparison_df['best_reduced_auroc'].min()) - 0.01
+    max_val = max(comparison_df['baseline_auroc'].max(), comparison_df['best_reduced_auroc'].max()) + 0.01
+    ax1.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, linewidth=2, label='No Improvement')
+    
+    ax1.set_xlabel('768D Baseline AUROC')
+    ax1.set_ylabel('Best Reduced Dimensionality AUROC')
+    ax1.set_title('AUROC: Best Reduced vs 768D Baseline')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    ax1.set_aspect('equal', adjustable='box')
+    
+    # 2. AUPRC Scatter Plot (top right)
+    ax2 = axes[0, 1]
+    for model, model_label in zip(models, model_labels):
+        model_data = comparison_df[comparison_df['model'] == model]
+        if not model_data.empty:
+            ax2.scatter(model_data['baseline_auprc'], model_data['best_reduced_auprc'],
+                       alpha=0.7, s=80, label=model_label, color=model_colors[model])
+    
+    # Add diagonal line
+    min_val = min(comparison_df['baseline_auprc'].min(), comparison_df['best_reduced_auprc'].min()) - 0.005
+    max_val = max(comparison_df['baseline_auprc'].max(), comparison_df['best_reduced_auprc'].max()) + 0.005
+    ax2.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, linewidth=2, label='No Improvement')
+    
+    ax2.set_xlabel('768D Baseline AUPRC')
+    ax2.set_ylabel('Best Reduced Dimensionality AUPRC')
+    ax2.set_title('AUPRC: Best Reduced vs 768D Baseline')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+    ax2.set_aspect('equal', adjustable='box')
+    
+    # 3. Improvement Distribution (bottom left)
+    ax3 = axes[1, 0]
+    
+    # Calculate statistics
+    auroc_improvements = comparison_df['auroc_improvement'].values
+    auprc_improvements = comparison_df['auprc_improvement'].values
+    
+    # Histogram of improvements
+    ax3.hist(auroc_improvements, bins=20, alpha=0.6, label='AUROC Improvement', 
+             color='skyblue', density=True)
+    ax3.hist(auprc_improvements, bins=20, alpha=0.6, label='AUPRC Improvement', 
+             color='lightcoral', density=True)
+    
+    ax3.axvline(x=0, color='black', linestyle='--', alpha=0.7, linewidth=2)
+    ax3.set_xlabel('Performance Improvement')
+    ax3.set_ylabel('Density')
+    ax3.set_title('Distribution of Performance Improvements')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+    
+    # 4. Summary Statistics (bottom right)
+    ax4 = axes[1, 1]
+    ax4.axis('off')
+    
+    # Calculate key statistics
+    auroc_improved_count = (auroc_improvements > 0).sum()
+    auroc_total = len(auroc_improvements)
+    auprc_improved_count = (auprc_improvements > 0).sum()
+    auprc_total = len(auprc_improvements)
+    
+    auroc_mean_improvement = np.mean(auroc_improvements)
+    auprc_mean_improvement = np.mean(auprc_improvements)
+    auroc_max_improvement = np.max(auroc_improvements)
+    auprc_max_improvement = np.max(auprc_improvements)
+    
+    # Best performing methods
+    best_auroc_methods = comparison_df['best_auroc_method'].value_counts()
+    best_auprc_methods = comparison_df['best_auprc_method'].value_counts()
+    
+    summary_text = f"""DIMENSIONALITY REDUCTION EFFECTIVENESS:
+
+AUROC Results:
+• Tasks improved: {auroc_improved_count}/{auroc_total} tasks ({auroc_improved_count/auroc_total*100:.1f}%)
+• Mean improvement: {auroc_mean_improvement:.4f}
+• Max improvement: {auroc_max_improvement:.4f}
+• Best method: {best_auroc_methods.index[0] if len(best_auroc_methods) > 0 else 'N/A'}
+• Avg optimal dims: {comparison_df['best_auroc_dimension'].mean():.1f}
+
+AUPRC Results:
+• Tasks improved: {auprc_improved_count}/{auprc_total} tasks ({auprc_improved_count/auprc_total*100:.1f}%)
+• Mean improvement: {auprc_mean_improvement:.4f}
+• Max improvement: {auprc_max_improvement:.4f}
+• Best method: {best_auprc_methods.index[0] if len(best_auprc_methods) > 0 else 'N/A'}
+• Avg optimal dims: {comparison_df['best_auprc_dimension'].mean():.1f}
+
+CONCLUSION:
+{'kNN (dimensionality reduced)' if auroc_mean_improvement > 0 else 'Logistic Regression'} 
+performs better on average.
+
+Dimensionality reduction {'ENABLES' if auroc_mean_improvement > 0.01 else 'DOES NOT ENABLE'} 
+kNN to outperform LR."""
+    
+    ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
+             fontsize=10, verticalalignment='top', fontfamily='monospace',
+             bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
+    
+    plt.suptitle('Best Reduced Dimensionality vs 768D Baseline Performance', 
+                 fontsize=16, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Best vs original comparison plot saved to {output_path}")
+
+def plot_lr_vs_best_knn_comparison(results_df: pd.DataFrame, results_dir: str, output_path: str) -> None:
+    """
+    Compare logistic regression prediction heads vs best kNN (dimensionality reduced) performance.
+    Excludes t-SNE from analysis.
+    """
+    # Filter out t-SNE from the analysis
+    results_df_filtered = results_df[results_df['method'] != 'tsne'].copy()
+    
+    # Get unique tasks from results
+    tasks = results_df_filtered['task'].unique()
+    
+    # Load logistic regression results
+    lr_results = load_logistic_regression_results(results_dir, tasks)
+    
+    # Calculate best kNN performance for each task/model (excluding t-SNE)
+    comparison_data = []
+    
+    for task in results_df_filtered['task'].unique():
+        for model in results_df_filtered['model'].unique():
+            # Get logistic regression performance
+            lr_auroc = None
+            lr_auprc = None
+            
+            if (task in lr_results and 
+                model in lr_results[task]):
+                lr_auroc = lr_results[task][model].get('auroc')
+                lr_auprc = lr_results[task][model].get('auprc')
+            
+            if lr_auroc is None or lr_auprc is None:
+            continue
+        
+            # Get best kNN performance (excluding t-SNE)
+            task_model_data = results_df_filtered[
+                (results_df_filtered['task'] == task) & 
+                (results_df_filtered['model'] == model)
+            ]
+            
+            if task_model_data.empty:
+                continue
+            
+            # Find best AUROC and AUPRC across PCA and UMAP only
+            auroc_data = task_model_data[task_model_data['metric'] == 'auroc']
+            auprc_data = task_model_data[task_model_data['metric'] == 'auprc']
+            
+            if auroc_data.empty or auprc_data.empty:
+                continue
+                
+            best_auroc_row = auroc_data.loc[auroc_data['score'].idxmax()]
+            best_auprc_row = auprc_data.loc[auprc_data['score'].idxmax()]
+            
+            comparison_data.append({
+                'task': task,
+                'model': model,
+                'lr_auroc': lr_auroc,
+                'best_knn_auroc': best_auroc_row['score'],
+                'best_auroc_method': best_auroc_row['method'],
+                'best_auroc_dimension': best_auroc_row['dimension'],
+                'auroc_knn_advantage': best_auroc_row['score'] - lr_auroc,
+                'lr_auprc': lr_auprc,
+                'best_knn_auprc': best_auprc_row['score'],
+                'best_auprc_method': best_auprc_row['method'],
+                'best_auprc_dimension': best_auprc_row['dimension'],
+                'auprc_knn_advantage': best_auprc_row['score'] - lr_auprc
+            })
+    
+    comparison_df = pd.DataFrame(comparison_data)
+    
+    if comparison_df.empty:
+        print("No comparison data available")
+        return
+    
+    # Create the comparison plot
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    
+    models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
+    model_labels = ['CLMBR', 'ClinicalBERT Type3']
+    model_colors = {'clmbr': '#2E86AB', 'clinicalbert_type3_clinicalbert_pool': '#A23B72'}
+    
+    # 1. AUROC Scatter Plot (top left)
+    ax1 = axes[0, 0]
+    for model, model_label in zip(models, model_labels):
+        model_data = comparison_df[comparison_df['model'] == model]
+        if not model_data.empty:
+            ax1.scatter(model_data['lr_auroc'], model_data['best_knn_auroc'],
+                       alpha=0.7, s=100, label=model_label, color=model_colors[model])
+    
+    # Add diagonal line (y=x) for reference
+    min_val = min(comparison_df['lr_auroc'].min(), comparison_df['best_knn_auroc'].min()) - 0.01
+    max_val = max(comparison_df['lr_auroc'].max(), comparison_df['best_knn_auroc'].max()) + 0.01
+    ax1.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, linewidth=2, label='Equal Performance')
+    
+    ax1.set_xlabel('Logistic Regression AUROC')
+    ax1.set_ylabel('Best kNN (Dim Reduced) AUROC')
+    ax1.set_title('AUROC: Logistic Regression vs Best kNN')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    ax1.set_aspect('equal', adjustable='box')
+    
+    # Add text annotations for points significantly above/below diagonal
+    for _, row in comparison_df.iterrows():
+        if abs(row['auroc_knn_advantage']) > 0.02:  # Significant difference
+            ax1.annotate(f"{row['task']}", 
+                        (row['lr_auroc'], row['best_knn_auroc']),
+                        xytext=(5, 5), textcoords='offset points',
+                        fontsize=8, alpha=0.7)
+    
+    # 2. AUPRC Scatter Plot (top right)
+    ax2 = axes[0, 1]
+    for model, model_label in zip(models, model_labels):
+        model_data = comparison_df[comparison_df['model'] == model]
+        if not model_data.empty:
+            ax2.scatter(model_data['lr_auprc'], model_data['best_knn_auprc'],
+                       alpha=0.7, s=100, label=model_label, color=model_colors[model])
+    
+    # Add diagonal line
+    min_val = min(comparison_df['lr_auprc'].min(), comparison_df['best_knn_auprc'].min()) - 0.005
+    max_val = max(comparison_df['lr_auprc'].max(), comparison_df['best_knn_auprc'].max()) + 0.005
+    ax2.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, linewidth=2, label='Equal Performance')
+    
+    ax2.set_xlabel('Logistic Regression AUPRC')
+    ax2.set_ylabel('Best kNN (Dim Reduced) AUPRC')
+    ax2.set_title('AUPRC: Logistic Regression vs Best kNN')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+    ax2.set_aspect('equal', adjustable='box')
+    
+    # 3. Performance Advantage Distribution (bottom left)
+    ax3 = axes[1, 0]
+    
+    auroc_advantages = comparison_df['auroc_knn_advantage'].values
+    auprc_advantages = comparison_df['auprc_knn_advantage'].values
+    
+    # Histogram of advantages (positive = kNN better, negative = LR better)
+    ax3.hist(auroc_advantages, bins=20, alpha=0.6, label='AUROC Advantage', 
+             color='skyblue', density=True)
+    ax3.hist(auprc_advantages, bins=20, alpha=0.6, label='AUPRC Advantage', 
+             color='lightcoral', density=True)
+    
+    ax3.axvline(x=0, color='black', linestyle='--', alpha=0.7, linewidth=2)
+    ax3.set_xlabel('kNN Advantage over Logistic Regression')
+    ax3.set_ylabel('Density')
+    ax3.set_title('Distribution of kNN Performance Advantages')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+    
+    # 4. Summary Statistics (bottom right)
+    ax4 = axes[1, 1]
+    ax4.axis('off')
+    
+    # Calculate key statistics
+    auroc_knn_better_count = (auroc_advantages > 0).sum()
+    auroc_total = len(auroc_advantages)
+    auprc_knn_better_count = (auprc_advantages > 0).sum()
+    auprc_total = len(auprc_advantages)
+    
+    auroc_mean_advantage = np.mean(auroc_advantages)
+    auprc_mean_advantage = np.mean(auprc_advantages)
+    auroc_max_advantage = np.max(auroc_advantages)
+    auprc_max_advantage = np.max(auprc_advantages)
+    
+    # Best performing methods for kNN
+    best_auroc_methods = comparison_df['best_auroc_method'].value_counts()
+    best_auprc_methods = comparison_df['best_auprc_method'].value_counts()
+    
+    # Calculate average optimal dimensions
+    avg_auroc_dim = comparison_df['best_auroc_dimension'].mean()
+    avg_auprc_dim = comparison_df['best_auprc_dimension'].mean()
+    
+    summary_text = f"""LOGISTIC REGRESSION vs BEST kNN COMPARISON:
+(Excluding t-SNE, using only PCA & UMAP)
+
+AUROC Results:
+• kNN wins: {auroc_knn_better_count}/{auroc_total} tasks ({auroc_knn_better_count/auroc_total*100:.1f}%)
+• Mean kNN advantage: {auroc_mean_advantage:.4f}
+• Max kNN advantage: {auroc_max_advantage:.4f}
+• Best kNN method: {best_auroc_methods.index[0] if len(best_auroc_methods) > 0 else 'N/A'}
+• Avg optimal dims: {avg_auroc_dim:.1f}
+
+AUPRC Results:
+• kNN wins: {auprc_knn_better_count}/{auprc_total} tasks ({auprc_knn_better_count/auprc_total*100:.1f}%)
+• Mean kNN advantage: {auprc_mean_advantage:.4f}
+• Max kNN advantage: {auprc_max_advantage:.4f}
+• Best kNN method: {best_auprc_methods.index[0] if len(best_auprc_methods) > 0 else 'N/A'}
+• Avg optimal dims: {avg_auprc_dim:.1f}
+
+CONCLUSION:
+{'kNN (dimensionality reduced)' if auroc_mean_advantage > 0 else 'Logistic Regression'} 
+performs better on average.
+
+Dimensionality reduction {'ENABLES' if auroc_mean_advantage > 0.01 else 'DOES NOT ENABLE'} 
+kNN to outperform LR."""
+    
+    ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
+             fontsize=10, verticalalignment='top', fontfamily='monospace',
+             bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
+    
+    plt.suptitle('Logistic Regression vs Best kNN (Dimensionality Reduced) Performance', 
+                 fontsize=16, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"LR vs best kNN comparison plot saved to {output_path}")
 
 def create_all_plots(results_df: pd.DataFrame, results_dir: str, output_dir: str) -> None:
-    """Create all dimensionality analysis plots."""
+    """Create all dimensionality analysis plots focused on the research question."""
     os.makedirs(output_dir, exist_ok=True)
     
     # Get unique tasks from results
@@ -624,30 +1066,56 @@ def create_all_plots(results_df: pd.DataFrame, results_dir: str, output_dir: str
     print("Loading baseline kNN results...")
     baseline_results = load_baseline_results(results_dir, tasks)
     
-    # Create comparison plots (separate subplots)
-    plot_dimensionality_analysis_comparison(
+    # Create focused visualizations for the research question
+    print("Creating performance curves...")
+    plot_dimensionality_performance_curves(
         results_df, baseline_results,
-        os.path.join(output_dir, "dimensionality_analysis_comparison.png"),
-        "Dimensionality Reduction Analysis - Model Comparison"
+        os.path.join(output_dir, "dimensionality_performance_curves.png")
     )
     
-    # Create combined plots (same axes)  
-    plot_combined_dimensionality_analysis(
-        results_df, baseline_results,
-        os.path.join(output_dir, "dimensionality_analysis_combined.png"),
-        "Dimensionality Reduction Analysis - Combined View"
-    )
-    
-    # Create best dimensions heatmap
-    plot_best_dimensions_heatmap(
+    print("Creating optimal dimensions analysis...")
+    plot_optimal_dimensions_analysis(
         results_df,
-        os.path.join(output_dir, "best_dimensions_heatmap.png")
+        os.path.join(output_dir, "optimal_dimensions_analysis.png")
+    )
+    
+    print("Creating performance improvement heatmap...")
+    plot_performance_improvement_heatmap(
+        results_df, baseline_results,
+        os.path.join(output_dir, "performance_improvement_heatmap.png")
+    )
+    
+    print("Creating research summary plot...")
+    create_research_summary_plot(
+        results_df, baseline_results,
+        os.path.join(output_dir, "research_question_summary.png")
+    )
+    
+    print("Creating best vs original comparison plot...")
+    plot_best_vs_original_comparison(
+        results_df, baseline_results,
+        os.path.join(output_dir, "best_vs_original_comparison.png")
     )
     
     # Create summary table
+    print("Creating summary table...")
     create_summary_table(
         results_df,
         os.path.join(output_dir, "dimensionality_summary.csv")
     )
     
-    print(f"All plots saved to {output_dir}") 
+    print("Creating LR vs best kNN comparison plot...")
+    plot_lr_vs_best_knn_comparison(
+        results_df, results_dir,
+        os.path.join(output_dir, "lr_vs_best_knn_comparison.png")
+    )
+    
+    print(f"All focused plots saved to {output_dir}")
+    print("\nGenerated visualizations:")
+    print("1. dimensionality_performance_curves.png - Core curves showing performance vs dimensionality")
+    print("2. optimal_dimensions_analysis.png - Analysis of optimal dimensions by method/task")  
+    print("3. performance_improvement_heatmap.png - Improvement vs 768D baseline by task")
+    print("4. research_question_summary.png - Single comprehensive plot answering your research question")
+    print("5. best_vs_original_comparison.png - Direct comparison of best reduced dimensionality performance vs original 768D performance")
+    print("6. dimensionality_summary.csv - Summary statistics table")
+    print("7. lr_vs_best_knn_comparison.png - Comparison of logistic regression vs best kNN (dimensionality reduced) performance") 

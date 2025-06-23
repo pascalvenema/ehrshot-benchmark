@@ -704,7 +704,7 @@ def plot_linear_vs_nonlinear_heads(df_results: pd.DataFrame,
 def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame, 
                                           score: str, 
                                           path_to_output_dir: str):
-    """Create a single consolidated plot comparing CLMBR vs ClinicalBERT across all tasks"""
+    """Create a single consolidated plot comparing CLMBR vs ClinicalBERT Type3 Custom Pooling across all tasks"""
     
     # Get tasks with both CLMBR and ClinicalBERT data
     shared_heads = ['lr_lbfgs', 'knn']
@@ -765,7 +765,7 @@ def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame,
             if not clmbr_data.empty:
                 clmbr_performances[head] = clmbr_data['value'].mean()
         
-        # ClinicalBERT performance by head
+        # ClinicalBERT Type3 Custom Pooling performance by head
         cb_performances = {}
         for head in shared_heads:
             cb_data = df_results[
@@ -797,9 +797,9 @@ def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame,
     
     # Create bars
     bars1 = ax.bar(x_positions - bar_width/2, clmbr_best_scores, bar_width, 
-                   label='CLMBR (Best Head)', color='steelblue', alpha=0.8)
+                   label='CLMBR (Best Prediction Head)', color='steelblue', alpha=0.8)
     bars2 = ax.bar(x_positions + bar_width/2, cb_best_scores, bar_width, 
-                   label='ClinicalBERT Type3 (Best Head)', color='lightcoral', alpha=0.8)
+                   label='ClinicalBERT Type3 Custom Pooling (Best Prediction Head)', color='lightcoral', alpha=0.8)
     
     # Add value labels on bars with best head information
     for i, (bar1, bar2, clmbr_head, cb_head) in enumerate(zip(bars1, bars2, clmbr_best_heads, cb_best_heads)):
@@ -848,12 +848,11 @@ def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame,
                 fontsize=10, fontweight='bold', 
                 bbox=dict(boxstyle="round,pad=0.3", facecolor=category_colors.get(category, 'lightgray'), alpha=0.7))
     
-    # Formatting
+    # Formatting with explicit labeling
     ax.set_ylabel(f'{score.upper()}', fontsize=14, fontweight='bold')
-    ax.set_title(f'CLMBR vs ClinicalBERT Type3 Performance by Task\n(Best Prediction Head Shown for Each Model)', 
-                 fontsize=16, fontweight='bold', pad=40)
+    # Title removed as requested
     ax.grid(True, alpha=0.3, axis='y')
-    ax.legend(loc='upper right', fontsize=12)
+    ax.legend(loc='lower right', fontsize=11)
     
     # Improve aesthetics
     ax.spines['top'].set_visible(False)
@@ -861,7 +860,7 @@ def plot_detailed_task_embedding_comparison(df_results: pd.DataFrame,
     ax.set_ylim(0, max(max(clmbr_best_scores), max(cb_best_scores)) * 1.25)
     
     plt.tight_layout()
-    plt.subplots_adjust(top=0.85, bottom=0.15)
+    plt.subplots_adjust(top=0.90, bottom=0.15)
     plt.savefig(os.path.join(path_to_output_dir, f"detailed_task_embedding_comparison_{score}.png"), dpi=300, bbox_inches='tight')
     plt.close('all')
     return fig

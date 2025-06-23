@@ -71,7 +71,7 @@ class kNNEvaluator:
         if len(np.unique(y)) < 2:
             logger.warning("Only one class present in labels, returning zero scores")
             return {'auroc': 0.0, 'auprc': 0.0}
-            
+        
         if run_evaluation is None:
             logger.error("Main pipeline evaluation function not available")
             return {'auroc': 0.0, 'auprc': 0.0}
@@ -104,9 +104,9 @@ class kNNEvaluator:
                 y_val=y_val,
                 y_test=y_test,
                 model_head='knn',
-                n_jobs=1
-            )
-            
+            n_jobs=1
+        )
+        
             return {
                 'auroc': scores['auroc'],
                 'auprc': scores['auprc']
