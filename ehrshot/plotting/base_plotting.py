@@ -329,3 +329,66 @@ def plot_one_task_group_box_plot(df: pd.DataFrame,
     ax.set_title(f'{TASK_GROUP_2_PAPER_NAME[task_group]} (Full Data)', size=14)
     ax.set_ylabel(score.upper(), fontsize=10)
     ax.grid(True, alpha=0.3) 
+
+def plot_column_per_patient(df: pd.DataFrame, 
+                          column: str, 
+                          ax: plt.Axes, 
+                          bins: int = 50,
+                          patient_id_col: str = 'patient_id',
+                          log_scale: bool = False) -> str:
+    """
+    Plot distribution of a column aggregated per patient.
+    
+    Args:
+        df: DataFrame containing patient data
+        column: Column to analyze (will count occurrences per patient)
+        ax: Matplotlib axes to plot on
+        bins: Number of histogram bins
+        patient_id_col: Name of patient ID column
+        log_scale: Whether to use log scale for y-axis
+        
+    Returns:
+        Title string for the plot
+    """
+    # Count events per patient
+    events_per_patient = df.groupby(patient_id_col).size()
+    
+    # Create visually appealing histogram
+    ax.hist(events_per_patient.values, bins=bins, alpha=0.8, edgecolor='white', 
+            color='#2E86AB', linewidth=0.8)
+    
+    # Calculate statistics
+    mean_events = events_per_patient.mean()
+    median_events = events_per_patient.median()
+    total_patients = len(events_per_patient)
+    
+    # Enhanced visual formatting
+    ax.set_xlabel('Number of Events per Patient', fontsize=12, fontweight='medium')
+    ax.set_ylabel('Number of Patients', fontsize=12, fontweight='medium')
+    if log_scale:
+        ax.set_yscale('log')
+    
+    # Fix x-axis: completely control ticks to avoid duplication
+    ax.set_xlim(0, 40000)  # Set both left and right limits explicitly
+    
+    # Use locator to completely control tick positions
+    from matplotlib.ticker import FixedLocator
+    tick_positions = [0, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000]
+    ax.xaxis.set_major_locator(FixedLocator(tick_positions))
+    ax.tick_params(axis='x', which='minor', bottom=False)  # Remove minor ticks
+    
+    # Enhanced styling
+    ax.tick_params(axis='both', which='major', labelsize=10, colors='#333333')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#CCCCCC')
+    ax.spines['bottom'].set_color('#CCCCCC')
+    
+    # Subtle grid for better readability
+    ax.grid(True, alpha=0.2, linestyle='-', linewidth=0.5, color='#CCCCCC')
+    ax.set_axisbelow(True)  # Put grid behind bars
+    
+    # Generate improved title that clarifies the clamping
+    title = f"Distribution of Event Counts per Patient (N={total_patients:,}, x-axis clamped at 40,000 for clarity)"
+    
+    return title 

@@ -8,4 +8,11 @@ This module contains specialized analysis functionality including:
 - Dimensionality reduction analysis
 """
 
-__all__ = [] 
+__all__ = []
+
+from .statistical_analysis import *
+from .clinicalbert_analysis import *
+from .clinicalbert_type_analysis import *
+from .research_questions_analysis import *
+from .dimensionality_reduction import *
+from .dimensionality_statistical_analysis import * 

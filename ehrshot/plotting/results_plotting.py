@@ -435,9 +435,9 @@ def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame,
     # Updated colors as requested: type1=blue, type2=green, type3=red
     # Use confidence interval lines instead of overlapping shaded areas
     for cb_type, cb_data, color, label in [
-        ('type1', type1_data, '#1f77b4', 'ClinicalBERT Type 1 (Custom Pooling)+LR'),
-        ('type2', type2_data, '#2ca02c', 'ClinicalBERT Type 2 (Custom Pooling)+LR'),
-        ('type3', type3_data, '#d62728', 'ClinicalBERT Type 3 (Custom Pooling)+LR')
+        ('type1', type1_data, '#1f77b4', 'ClinicalBERT "codes" (type 1) + LR'),
+        ('type2', type2_data, '#2ca02c', 'ClinicalBERT "descriptions" (type 2) + LR'),
+        ('type3', type3_data, '#d62728', 'ClinicalBERT "human_narrative" (type 3) + LR')
     ]:
         if cb_data.empty:
             continue
@@ -456,7 +456,7 @@ def plot_clinicalbert_comparison_by_type(df_results: pd.DataFrame,
                color=color, linewidth=1, alpha=0.6, linestyle='--')
     
     ax.set_xlabel('# of Train Examples per Class', fontsize=14)
-    ax.set_ylabel(f'Mean {score.upper()} Score Over All Tasks', fontsize=14)
+    ax.set_ylabel(f'{score.upper()}', fontsize=14)
     # Remove title as requested
     
     if is_x_scale_log:
@@ -509,33 +509,33 @@ def plot_clinicalbert_pooling_comparison_mean_all_tasks(df_results: pd.DataFrame
         
         # Handle "All" data point
         ks = sorted(model_data['k'].unique().tolist())
-    x_tick_labels = [str(k) for k in ks]
-    if -1 in ks:
-        ks.remove(-1)
+        x_tick_labels = [str(k) for k in ks]
+        if -1 in ks:
+            ks.remove(-1)
             full_data_k = 2 * max(ks) if ks else 256
-        ks.append(full_data_k)
-        x_tick_labels = [str(k) if k != full_data_k else 'All' for k in ks]
-                model_data = model_data.copy()
-                model_data.loc[model_data['k'] == -1, 'k'] = full_data_k
+            ks.append(full_data_k)
+            x_tick_labels = [str(k) if k != full_data_k else 'All' for k in ks]
+            model_data = model_data.copy()
+            model_data.loc[model_data['k'] == -1, 'k'] = full_data_k
             
         # Group by k-value and compute mean/std across ALL labeling functions
-            grouped = model_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
+        grouped = model_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
             
         # Create label based on pooling strategy
         pool_label = pooling.replace('_', ' ').title()
         if pooling == 'clinicalbert_pool':
             pool_label = 'Custom Pooling'
             
-            # Plot main line
-            ax.plot(grouped['k'], grouped['mean'], 
+        # Plot main line
+        ax.plot(grouped['k'], grouped['mean'], 
                color=color, label=f'{pool_label}', 
                linewidth=3, marker=marker, markersize=8)
         
         # Add confidence interval lines
-            ax.plot(grouped['k'], grouped['mean'] + grouped['std'], 
-                   color=color, linewidth=1, alpha=0.6, linestyle='--')
-            ax.plot(grouped['k'], grouped['mean'] - grouped['std'], 
-                   color=color, linewidth=1, alpha=0.6, linestyle='--')
+        ax.plot(grouped['k'], grouped['mean'] + grouped['std'], 
+               color=color, linewidth=1, alpha=0.6, linestyle='--')
+        ax.plot(grouped['k'], grouped['mean'] - grouped['std'], 
+               color=color, linewidth=1, alpha=0.6, linestyle='--')
     
     ax.set_xlabel('# of Train Examples per Class', fontsize=14)
     ax.set_ylabel(f'Mean {score.upper()} Score Over All Tasks', fontsize=14)
@@ -543,8 +543,8 @@ def plot_clinicalbert_pooling_comparison_mean_all_tasks(df_results: pd.DataFrame
     
     ax.set_xscale('log')
     if 'ks' in locals():
-    ax.set_xticks(ks)
-    ax.set_xticklabels(x_tick_labels)
+        ax.set_xticks(ks)
+        ax.set_xticklabels(x_tick_labels)
     
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=12, loc='lower right')
@@ -794,13 +794,12 @@ def plot_embedding_comparison_lr_only(df_results: pd.DataFrame,
         
         if not cb_data.empty:
             cb_grouped = cb_data.groupby('k')['value'].agg(['mean', 'std']).reset_index()
-                
-                ax.errorbar(cb_grouped['k'], cb_grouped['mean'], yerr=cb_grouped['std'], 
-                           color=cb_style['color'],
-                           linestyle=cb_style['linestyle'],
-                           marker=cb_style['marker'],
-                           label=cb_style['label'],
-                           linewidth=2.5, markersize=8, alpha=0.9)
+            ax.errorbar(cb_grouped['k'], cb_grouped['mean'], yerr=cb_grouped['std'], 
+                       color=cb_style['color'],
+                       linestyle=cb_style['linestyle'],
+                       marker=cb_style['marker'],
+                       label=cb_style['label'],
+                       linewidth=2.5, markersize=8, alpha=0.9)
         
         ax.set_xlabel('# of Train Examples per Class', fontsize=12)
         ax.set_ylabel(f'{score.upper()}', fontsize=12)
@@ -849,7 +848,7 @@ def main():
     for labeling_function in tqdm(LABELING_FUNCTION_2_PAPER_NAME.keys()):
         path_to_csv = os.path.join(args.path_to_results_dir, f"{labeling_function}/all_results.csv")
         if os.path.exists(path_to_csv):
-        dfs.append(pd.read_csv(path_to_csv))
+            dfs.append(pd.read_csv(path_to_csv))
     
     if not dfs:
         print("❌ No results files found!")
