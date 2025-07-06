@@ -52,7 +52,7 @@ def test_individual_reducers():
     # Create small synthetic dataset
     X_train, X_val, X_test, y_train, y_val, y_test = create_synthetic_clinical_data(n_samples=200, n_features=100)
     
-    methods = ['pca', 'umap']  # Skip t-SNE for speed in demo
+    methods = ['pca', 'umap']  # Only PCA and UMAP are supported
     n_components = 10
     
     for method in methods:
@@ -84,7 +84,7 @@ def run_full_demo():
         X_train, X_val, X_test, y_train, y_val, y_test,
         task_name="Synthetic Clinical Task",
         dimensions_to_test=[5, 10, 20, 50],
-        methods=['pca', 'umap']  # Skip t-SNE for demo speed
+        methods=['pca', 'umap']  # Only PCA and UMAP are supported
     )
     
     print("\nResults:")

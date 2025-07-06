@@ -1,0 +1,61 @@
+Job ID: 12964876
+Job Name: dim_reduction_maximum
+Node: tcn797
+Start Time: Fri Jul  4 12:21:41 CEST 2025
+Working Directory: /gpfs/home6/pvenema/ehrshot-benchmark/ehrshot/bash_scripts
+Python version: Python 3.10.16
+Conda environment: EHRSHOT_ENV
+Available memory:                total        used        free      shared  buff/cache   available
+Mem:           377Gi        24Gi       354Gi       345Mi       4.5Gi       353Gi
+Swap:             0B          0B          0B
+Available CPUs: 128
+Safe Maximum Performance Threading Configuration:
+  CPUs allocated: 128
+  Memory allocated: 286720MB
+  OMP_NUM_THREADS: 64 (capped for stability)
+  MKL_NUM_THREADS: 64 (capped for stability)
+  SKLEARN_N_JOBS: 128 (full allocation)
+  Node: tcn797
+Initial resource usage:
+               total        used        free      shared  buff/cache   available
+Mem:           377Gi        24Gi       354Gi       345Mi       4.5Gi       353Gi
+Swap:             0B          0B          0B
+top - 12:21:42 up 2 days,  1:35,  2 users,  load average: 24.18, 24.07, 24.01
+Tasks: 1836 total,  25 running, 1811 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 12.5 us,  0.1 sy,  0.0 ni, 87.3 id,  0.0 wa,  0.1 hi,  0.0 si,  0.0 st
+MiB Mem : 386603.0 total, 362552.7 free,  25038.9 used,   4640.0 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used. 361564.1 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 604552 jellel    20   0 6436292 239568  67584 R 100.0   0.1   2569:01 lmp
+ 604553 jellel    20   0 2104304 213580  64512 R 100.0   0.1   2573:32 lmp
+ 604554 jellel    20   0 3643616 214824  66048 R 100.0   0.1   2573:42 lmp
+ 604555 jellel    20   0   13.5g 213520  66048 R 100.0   0.1   2571:55 lmp
+ 604556 jellel    20   0   16.2g 231512  66048 R 100.0   0.1   2573:46 lmp
+ 604557 jellel    20   0   10.9g 215412  66048 R 100.0   0.1   2573:44 lmp
+ 604558 jellel    20   0 3985748 216584  67584 R 100.0   0.1   2573:12 lmp
+ 604559 jellel    20   0   14.5g 214776  66048 R 100.0   0.1   2573:46 lmp
+Starting SAFE MAXIMUM PERFORMANCE dimensionality reduction analysis...
+🧬 Starting EHRSHOT Dimensionality Reduction Analysis
+==================================================
+Database: ../EHRSHOT_ASSETS/femr/extract
+Labels:   ../EHRSHOT_ASSETS/benchmark
+Features: ../EHRSHOT_ASSETS/features
+Splits:   ../EHRSHOT_ASSETS/splits/person_id_map.csv
+Output:   ../EHRSHOT_ASSETS/dimensionality_analysis
+
+🚀 Running dimensionality reduction analysis...
+
+JOB STATISTICS
+==============
+Job ID: 12964876
+Cluster: snellius
+User/Group: pvenema/pvenema
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 144
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 72-00:40:48 core-walltime
+Job Wall-clock time: 12:00:17
+Memory Utilized: 20.82 GB
+Memory Efficiency: 7.43% of 280.00 GB (280.00 GB/node)

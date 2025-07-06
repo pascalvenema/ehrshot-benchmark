@@ -109,15 +109,12 @@ def load_logistic_regression_results(results_dir: str, tasks: List[str]) -> Dict
 def plot_dimensionality_performance_curves(results_df: pd.DataFrame, baseline_results: Dict, output_path: str) -> None:
     """
     Core visualization: Performance curves showing how kNN performance changes with dimensionality.
-    This directly answers the research question. (Excludes t-SNE)
+    This directly answers the research question.
     """
-    # Filter out t-SNE
-    results_df = results_df[results_df['method'] != 'tsne'].copy()
-    
     # Prepare data
     models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
     model_labels = ['CLMBR', 'ClinicalBERT Type3']
-    methods = ['pca', 'umap']  # Removed tsne
+    methods = ['pca', 'umap']
     method_colors = {'pca': '#2E86AB', 'umap': '#A23B72'}
     
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
@@ -153,7 +150,7 @@ def plot_dimensionality_performance_curves(results_df: pd.DataFrame, baseline_re
                     ax.fill_between(dimensions, baseline_mean - baseline_std, baseline_mean + baseline_std,
                                    color='black', alpha=0.1)
             
-            # Plot each dimensionality reduction method (excluding t-SNE)
+            # Plot each dimensionality reduction method
             for method in methods:
                 method_data = model_data[
                     (model_data['method'] == method) & 
@@ -161,7 +158,7 @@ def plot_dimensionality_performance_curves(results_df: pd.DataFrame, baseline_re
                 ]
                 
                 if method_data.empty:
-                continue
+                    continue
                 
                 # Calculate mean and std across tasks for each dimension
                 mean_scores = []
@@ -218,8 +215,8 @@ def plot_optimal_dimensions_analysis(results_df: pd.DataFrame, output_path: str)
     optimal_dims = []
     
     for task in results_df['task'].unique():
-    for model in results_df['model'].unique():
-        for method in results_df['method'].unique():
+        for model in results_df['model'].unique():
+            for method in results_df['method'].unique():
                 for metric in ['auroc', 'auprc']:
                     subset = results_df[
                         (results_df['task'] == task) &
@@ -398,8 +395,8 @@ def plot_performance_improvement_heatmap(results_df: pd.DataFrame, baseline_resu
     for model_idx, (model, model_label) in enumerate(zip(models, model_labels)):
         model_data = improvement_df[improvement_df['model'] == model]
             
-            if model_data.empty:
-                continue
+        if model_data.empty:
+            continue
             
         # Find best improvement for each task/method combination
         best_improvements = []
@@ -444,7 +441,7 @@ def plot_performance_improvement_heatmap(results_df: pd.DataFrame, baseline_resu
             
             metric_data = best_df[best_df['metric'] == metric]
             if metric_data.empty:
-                    continue
+                continue
                 
             # Create pivot table for heatmap
             heatmap_data = metric_data.pivot(index='method', columns='task', values='improvement')
@@ -504,17 +501,17 @@ def create_research_summary_plot(results_df: pd.DataFrame, baseline_results: Dic
             method_scores = []
             method_stds = []
                 
-                for dim in dimensions:
+            for dim in dimensions:
                 dim_scores = results_df[
                     (results_df['method'] == method) &
                     (results_df['dimension'] == dim) &
                     (results_df['metric'] == metric)
-                    ]['score'].values
-                    
-                    if len(dim_scores) > 0:
+                ]['score'].values
+                
+                if len(dim_scores) > 0:
                     method_scores.append(np.mean(dim_scores))
                     method_stds.append(np.std(dim_scores))
-                    else:
+                else:
                     method_scores.append(np.nan)
                     method_stds.append(np.nan)
             
@@ -522,13 +519,13 @@ def create_research_summary_plot(results_df: pd.DataFrame, baseline_results: Dic
                        color=method_colors[method], marker='o', linewidth=3, markersize=8,
                        label=method.upper(), capsize=5)
         
-            ax.set_xlabel('Reduced Dimensions')
+        ax.set_xlabel('Reduced Dimensions')
         ax.set_ylabel(f'{metric.upper()} Score')
         ax.set_title(f'Overall {metric.upper()} vs Dimensionality')
         ax.set_xscale('log')
         ax.set_xticks(dimensions)
         ax.set_xticklabels([str(d) for d in dimensions])
-            ax.grid(True, alpha=0.3)
+        ax.grid(True, alpha=0.3)
         ax.legend()
     
     # 2. Key findings summary (top right)
@@ -568,7 +565,6 @@ def create_research_summary_plot(results_df: pd.DataFrame, baseline_results: Dic
 
 • PCA generally peaks at: 100-200D
 • UMAP optimal range: 25-100D  
-• t-SNE works best at: 2-25D
 
 CONCLUSION:
 Dimensionality reduction {'CAN' if avg_improvement > 0.01 else 'RARELY'} 
@@ -596,11 +592,11 @@ evident for kNN on clinical embeddings."""
             model_method_data = method_data[method_data['model'] == model]
             
             # Calculate mean across tasks for this model
-                mean_scores = []
-                for dim in dimensions:
+            mean_scores = []
+            for dim in dimensions:
                 dim_scores = model_method_data[
                     model_method_data['dimension'] == dim
-                    ]['score'].values
+                ]['score'].values
                 mean_scores.append(np.mean(dim_scores) if len(dim_scores) > 0 else np.nan)
             
             ax.plot(dimensions, mean_scores, marker='o', linewidth=3, markersize=8,
@@ -818,6 +814,10 @@ def plot_best_vs_original_comparison(results_df: pd.DataFrame, baseline_results:
     best_auroc_methods = comparison_df['best_auroc_method'].value_counts()
     best_auprc_methods = comparison_df['best_auprc_method'].value_counts()
     
+    # Calculate average optimal dimensions
+    avg_auroc_dim = comparison_df['best_auroc_dimension'].mean()
+    avg_auprc_dim = comparison_df['best_auprc_dimension'].mean()
+    
     summary_text = f"""DIMENSIONALITY REDUCTION EFFECTIVENESS:
 
 AUROC Results:
@@ -855,22 +855,18 @@ kNN to outperform LR."""
 def plot_lr_vs_best_knn_comparison(results_df: pd.DataFrame, results_dir: str, output_path: str) -> None:
     """
     Compare logistic regression prediction heads vs best kNN (dimensionality reduced) performance.
-    Excludes t-SNE from analysis.
     """
-    # Filter out t-SNE from the analysis
-    results_df_filtered = results_df[results_df['method'] != 'tsne'].copy()
-    
     # Get unique tasks from results
-    tasks = results_df_filtered['task'].unique()
+    tasks = results_df['task'].unique()
     
     # Load logistic regression results
     lr_results = load_logistic_regression_results(results_dir, tasks)
     
-    # Calculate best kNN performance for each task/model (excluding t-SNE)
+    # Calculate best kNN performance for each task/model
     comparison_data = []
     
-    for task in results_df_filtered['task'].unique():
-        for model in results_df_filtered['model'].unique():
+    for task in results_df['task'].unique():
+        for model in results_df['model'].unique():
             # Get logistic regression performance
             lr_auroc = None
             lr_auprc = None
@@ -881,12 +877,12 @@ def plot_lr_vs_best_knn_comparison(results_df: pd.DataFrame, results_dir: str, o
                 lr_auprc = lr_results[task][model].get('auprc')
             
             if lr_auroc is None or lr_auprc is None:
-            continue
+                continue
         
-            # Get best kNN performance (excluding t-SNE)
-            task_model_data = results_df_filtered[
-                (results_df_filtered['task'] == task) & 
-                (results_df_filtered['model'] == model)
+            # Get best kNN performance
+            task_model_data = results_df[
+                (results_df['task'] == task) & 
+                (results_df['model'] == model)
             ]
             
             if task_model_data.empty:
@@ -1021,7 +1017,7 @@ def plot_lr_vs_best_knn_comparison(results_df: pd.DataFrame, results_dir: str, o
     avg_auprc_dim = comparison_df['best_auprc_dimension'].mean()
     
     summary_text = f"""LOGISTIC REGRESSION vs BEST kNN COMPARISON:
-(Excluding t-SNE, using only PCA & UMAP)
+(Using PCA & UMAP)
 
 AUROC Results:
 • kNN wins: {auroc_knn_better_count}/{auroc_total} tasks ({auroc_knn_better_count/auroc_total*100:.1f}%)
@@ -1111,11 +1107,122 @@ def create_all_plots(results_df: pd.DataFrame, results_dir: str, output_dir: str
     )
     
     print(f"All focused plots saved to {output_dir}")
-    print("\nGenerated visualizations:")
-    print("1. dimensionality_performance_curves.png - Core curves showing performance vs dimensionality")
-    print("2. optimal_dimensions_analysis.png - Analysis of optimal dimensions by method/task")  
-    print("3. performance_improvement_heatmap.png - Improvement vs 768D baseline by task")
-    print("4. research_question_summary.png - Single comprehensive plot answering your research question")
-    print("5. best_vs_original_comparison.png - Direct comparison of best reduced dimensionality performance vs original 768D performance")
-    print("6. dimensionality_summary.csv - Summary statistics table")
-    print("7. lr_vs_best_knn_comparison.png - Comparison of logistic regression vs best kNN (dimensionality reduced) performance") 
+    print("\n📊 Summary:")
+    print(f"• Processed {len(results_df)} experiments using PCA & UMAP")
+
+def plot_dimensionality_results(results_df: pd.DataFrame, output_dir: str) -> None:
+    """
+    Create comprehensive plots for dimensionality reduction results.
+    
+    Args:
+        results_df: DataFrame with columns ['task', 'reduction_method', 'n_components', 'auroc', 'auprc']
+        output_dir: Directory to save plots
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Create performance curves
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    
+    # AUROC curves
+    ax1 = axes[0]
+    methods = results_df['reduction_method'].unique()
+    
+    for method in methods:
+        method_data = results_df[results_df['reduction_method'] == method].sort_values('n_components')
+        if method == 'none':
+            # Plot baseline as horizontal line
+            baseline_auroc = method_data['auroc'].iloc[0]
+            ax1.axhline(y=baseline_auroc, color='red', linestyle='--', linewidth=2, 
+                       label=f'Baseline (no reduction): {baseline_auroc:.3f}')
+        else:
+            ax1.plot(method_data['n_components'], method_data['auroc'], 
+                    marker='o', linewidth=2, markersize=6, label=method.upper())
+    
+    ax1.set_xlabel('Number of Dimensions')
+    ax1.set_ylabel('AUROC')
+    ax1.set_title('AUROC vs Number of Dimensions')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    
+    # AUPRC curves
+    ax2 = axes[1]
+    
+    for method in methods:
+        method_data = results_df[results_df['reduction_method'] == method].sort_values('n_components')
+        if method == 'none':
+            # Plot baseline as horizontal line
+            baseline_auprc = method_data['auprc'].iloc[0]
+            ax2.axhline(y=baseline_auprc, color='red', linestyle='--', linewidth=2, 
+                       label=f'Baseline (no reduction): {baseline_auprc:.3f}')
+        else:
+            ax2.plot(method_data['n_components'], method_data['auprc'], 
+                    marker='o', linewidth=2, markersize=6, label=method.upper())
+    
+    ax2.set_xlabel('Number of Dimensions')
+    ax2.set_ylabel('AUPRC')
+    ax2.set_title('AUPRC vs Number of Dimensions')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'dimensionality_performance_curves.png'), 
+                dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    # Create comparison bar chart
+    fig, ax = plt.subplots(figsize=(12, 8))
+    
+    # Find best performance for each method
+    best_results = []
+    for method in methods:
+        method_data = results_df[results_df['reduction_method'] == method]
+        if method == 'none':
+            best_auroc_row = method_data.iloc[0]
+            best_auprc_row = method_data.iloc[0]
+        else:
+            best_auroc_row = method_data.loc[method_data['auroc'].idxmax()]
+            best_auprc_row = method_data.loc[method_data['auprc'].idxmax()]
+        
+        best_results.append({
+            'method': method,
+            'best_auroc': best_auroc_row['auroc'],
+            'best_auroc_dims': best_auroc_row['n_components'],
+            'best_auprc': best_auprc_row['auprc'],
+            'best_auprc_dims': best_auprc_row['n_components']
+        })
+    
+    best_df = pd.DataFrame(best_results)
+    
+    x = np.arange(len(best_df))
+    width = 0.35
+    
+    bars1 = ax.bar(x - width/2, best_df['best_auroc'], width, label='Best AUROC', alpha=0.8)
+    bars2 = ax.bar(x + width/2, best_df['best_auprc'], width, label='Best AUPRC', alpha=0.8)
+    
+    ax.set_xlabel('Dimensionality Reduction Method')
+    ax.set_ylabel('Performance Score')
+    ax.set_title('Best Performance by Method')
+    ax.set_xticks(x)
+    ax.set_xticklabels([m.upper() if m != 'none' else 'BASELINE' for m in best_df['method']])
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # Add value labels on bars
+    for bar in bars1:
+        height = bar.get_height()
+        ax.annotate(f'{height:.3f}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                   xytext=(0, 3), textcoords="offset points", ha='center', va='bottom')
+    
+    for bar in bars2:
+        height = bar.get_height()
+        ax.annotate(f'{height:.3f}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                   xytext=(0, 3), textcoords="offset points", ha='center', va='bottom')
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'best_performance_comparison.png'), 
+                dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    print(f"✅ Plots saved to {output_dir}/")
+    print("  - dimensionality_performance_curves.png")
+    print("  - best_performance_comparison.png") 

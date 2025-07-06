@@ -163,6 +163,131 @@ def create_clean_dimensionality_plots(results_df: pd.DataFrame,
         
         print(f"✅ Saved: clean_{metric}_vs_dimensions_separated.png")
 
+def create_per_task_dimensionality_plots(results_df: pd.DataFrame, 
+                                        baseline_results: Dict, 
+                                        output_dir: str) -> None:
+    """Create dimensionality plots showing performance for each individual task."""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    print("Creating per-task dimensionality plots...")
+    
+    # Use all 14 expected tasks, regardless of whether results are available yet
+    tasks = [
+        # Operational outcomes
+        'guo_los', 'guo_readmission', 'guo_icu',
+        # Lab values  
+        'lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia',
+        # New diagnoses
+        'new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi'
+    ]
+    
+    models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
+    model_labels = ['CLMBR', 'ClinicalBERT Type3']
+    methods = ['pca', 'umap']
+    method_colors = {'pca': '#1f77b4', 'umap': '#ff7f0e'}
+    
+    # Get available tasks from data for reference
+    available_tasks = set(results_df['task'].unique()) if not results_df.empty else set()
+    print(f"Including all 14 tasks in grid. Available results for: {len(available_tasks)} tasks")
+    
+    # Create separate plots for AUROC and AUPRC
+    for metric in ['auroc', 'auprc']:
+        # Calculate subplot grid size - we want tasks in rows, models in columns
+        n_tasks = len(tasks)
+        n_models = len(models)
+        
+        # Create figure with subplots for each task-model combination
+        fig, axes = plt.subplots(n_tasks, n_models, figsize=(8 * n_models, 4 * n_tasks))
+        
+        # Handle single task case
+        if n_tasks == 1:
+            axes = axes.reshape(1, -1)
+        if n_models == 1:
+            axes = axes.reshape(-1, 1)
+        
+        for task_idx, task in enumerate(tasks):
+            for model_idx, (model, model_label) in enumerate(zip(models, model_labels)):
+                if n_tasks == 1 and n_models == 1:
+                    ax = axes
+                elif n_tasks == 1:
+                    ax = axes[model_idx]
+                elif n_models == 1:
+                    ax = axes[task_idx]
+                else:
+                    ax = axes[task_idx, model_idx]
+                
+                # Filter data for this task, model and metric
+                task_model_data = results_df[
+                    (results_df['task'] == task) &
+                    (results_df['model'] == model) &
+                    (results_df['metric'] == metric)
+                ]
+                
+                if task_model_data.empty:
+                    # Determine if task is still being processed or has no data
+                    status = "Processing..." if task not in available_tasks else "No Data"
+                    ax.set_title(f'{task}\n{model_label} - {status}')
+                    ax.set_xlabel('Reduced Dimensions')
+                    ax.set_ylabel(f'{metric.upper()}')
+                    ax.text(0.5, 0.5, status, transform=ax.transAxes, 
+                           ha='center', va='center', fontsize=12, alpha=0.6)
+                    continue
+                
+                # Get dimensions tested for this task/model
+                dimensions = sorted(task_model_data['dimension'].unique())
+                
+                # Plot each reduction method
+                for method in methods:
+                    method_data = task_model_data[task_model_data['method'] == method]
+                    
+                    if not method_data.empty:
+                        # Get scores for each dimension
+                        scores = []
+                        for dim in dimensions:
+                            dim_data = method_data[method_data['dimension'] == dim]
+                            if not dim_data.empty:
+                                scores.append(dim_data['score'].iloc[0])
+                            else:
+                                scores.append(np.nan)
+                        
+                        # Plot the line
+                        ax.plot(dimensions, scores, 
+                               color=method_colors[method], label=method.upper(), 
+                               linewidth=2, marker='o', markersize=6)
+                
+                # Add baseline if available
+                if (baseline_results and task in baseline_results and 
+                    model in baseline_results[task] and 
+                    metric in baseline_results[task][model]):
+                    baseline_score = baseline_results[task][model][metric]
+                    ax.axhline(y=baseline_score, color='black', linestyle='--', 
+                              linewidth=1.5, alpha=0.7, label='768D Baseline')
+                
+                # Customize subplot
+                ax.set_xlabel('Reduced Dimensions', fontsize=10)
+                ax.set_ylabel(f'{metric.upper()}', fontsize=10)
+                ax.set_title(f'{task}\n{model_label}', fontsize=11, fontweight='bold')
+                ax.set_xscale('log')
+                if dimensions:
+                    ax.set_xticks(dimensions)
+                    ax.set_xticklabels([str(d) for d in dimensions], fontsize=8)
+                ax.grid(True, alpha=0.3)
+                
+                # Only show legend on first subplot to avoid clutter
+                if task_idx == 0 and model_idx == 0:
+                    ax.legend(fontsize=9)
+        
+        plt.suptitle(f'Per-Task Dimensionality Reduction Performance - {metric.upper()}', 
+                    fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        
+        # Save the per-task plot
+        output_file = os.path.join(output_dir, f"clean_{metric}_vs_dimensions_per_task.png")
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"✅ Saved: clean_{metric}_vs_dimensions_per_task.png")
+
 def main():
     parser = argparse.ArgumentParser(description="Generate clean dimensionality reduction plots")
     parser.add_argument("--results_csv", required=True, 
@@ -195,6 +320,9 @@ def main():
     
     # Create clean separated plots (the main ones requested)
     create_clean_dimensionality_plots(results_df, baseline_results, args.output_dir, include_baseline)
+    
+    # Create per-task plots (new functionality)
+    create_per_task_dimensionality_plots(results_df, baseline_results, args.output_dir)
     
     print("✅ Dimensionality plotting completed successfully!")
 

@@ -1,0 +1,283 @@
+2025-07-03 20:52:47.292 | INFO     | evaluator:<module>:48 - Using 190 parallel jobs for scikit-learn operations
+2025-07-03 20:52:48.127 | INFO     | __main__:main:307 - Starting EHRSHOT dimensionality reduction analysis
+2025-07-03 20:52:48.127 | INFO     | __main__:main:308 - Arguments: {'path_to_database': '../EHRSHOT_ASSETS/femr/extract', 'path_to_labels_dir': '../EHRSHOT_ASSETS/benchmark', 'path_to_features_dir': '../EHRSHOT_ASSETS/features', 'path_to_split_csv': '../EHRSHOT_ASSETS/splits/person_id_map.csv', 'tasks': ['guo_los', 'guo_readmission', 'guo_icu', 'lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia', 'new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi'], 'models': ['clmbr', 'clinicalbert_type3_clinicalbert_pool'], 'dimensions': [2, 5, 10, 25, 50, 100, 200, 400], 'methods': ['pca', 'umap'], 'output_dir': '../EHRSHOT_ASSETS/dimensionality_analysis'}
+2025-07-03 20:52:48.128 | INFO     | __main__:run_dimensionality_analysis:89 - Starting dimensionality analysis for 14 tasks, 2 models
+2025-07-03 20:52:48.128 | INFO     | __main__:run_dimensionality_analysis:90 - Testing dimensions: [2, 5, 10, 25, 50, 100, 200, 400]
+2025-07-03 20:52:48.128 | INFO     | __main__:run_dimensionality_analysis:91 - Using methods: ['pca', 'umap']
+2025-07-03 20:52:48.128 | INFO     | __main__:run_dimensionality_analysis:94 - 
+==================================================
+2025-07-03 20:52:48.128 | INFO     | __main__:run_dimensionality_analysis:95 - Processing task: guo_los
+2025-07-03 20:52:48.128 | INFO     | __main__:run_dimensionality_analysis:96 - ==================================================
+2025-07-03 20:52:48.152 | INFO     | __main__:run_dimensionality_analysis:102 - Loaded labeled patients for guo_los
+2025-07-03 20:53:06.221 | INFO     | __main__:run_dimensionality_analysis:119 - 
+Processing model: clmbr
+2025-07-03 20:53:06.226 | INFO     | __main__:run_dimensionality_analysis:138 - Data shapes - Train: (2569, 768), Val: (2231, 768), Test: (2195, 768)
+2025-07-03 20:53:06.227 | INFO     | __main__:run_dimensionality_analysis:139 - Label distribution - Train: 0.265, Val: 0.239, Test: 0.251
+2025-07-03 20:53:06.227 | INFO     | __main__:run_dimensionality_analysis:142 -   Evaluating baseline (no dimensionality reduction)
+2025-07-03 20:53:06.227 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:53:06.227 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 768), Y = (2569,)
+2025-07-03 20:53:06.227 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 768), Y = (2231,)
+2025-07-03 20:53:06.228 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 768), Y = (2195,)
+2025-07-03 20:53:06.228 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:53:06.228 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:53:06.228 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:53:06.229 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:53:53.877 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:53:53.880 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:53:54.368 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:53:54.368 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7420585788094876
+2025-07-03 20:53:54.368 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7474259484682492
+2025-07-03 20:53:54.371 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:53:54.371 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.47489890459323386
+2025-07-03 20:53:54.371 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.5136557361175533
+2025-07-03 20:53:54.372 | INFO     | __main__:run_dimensionality_analysis:156 -   Baseline Results: AUROC=0.747, AUPRC=0.514
+2025-07-03 20:53:54.372 | INFO     | __main__:run_dimensionality_analysis:159 - 
+  Testing method: pca
+2025-07-03 20:53:54.372 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 2 dimensions...
+2025-07-03 20:53:54.372 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 2 dimensions
+2025-07-03 20:53:54.436 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 2), Val: (2231, 2), Test: (2195, 2)
+2025-07-03 20:53:54.437 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:53:54.437 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 2), Y = (2569,)
+2025-07-03 20:53:54.437 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 2), Y = (2231,)
+2025-07-03 20:53:54.437 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 2), Y = (2195,)
+2025-07-03 20:53:54.437 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:53:54.437 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:53:54.438 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:53:54.438 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:53:59.668 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'uniform'}
+2025-07-03 20:53:59.669 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:00.045 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 0.8010115669877299
+2025-07-03 20:54:00.046 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.5738685143864807
+2025-07-03 20:54:00.046 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.531755824005222
+2025-07-03 20:54:00.048 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 0.5400119353886951
+2025-07-03 20:54:00.048 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.27639574861582206
+2025-07-03 20:54:00.048 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.267738340596753
+2025-07-03 20:54:00.048 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.532, AUPRC=0.268
+2025-07-03 20:54:00.049 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 5 dimensions...
+2025-07-03 20:54:00.049 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 5 dimensions
+2025-07-03 20:54:00.102 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 5), Val: (2231, 5), Test: (2195, 5)
+2025-07-03 20:54:00.103 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:00.103 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 5), Y = (2569,)
+2025-07-03 20:54:00.103 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 5), Y = (2231,)
+2025-07-03 20:54:00.103 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 5), Y = (2195,)
+2025-07-03 20:54:00.103 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:00.104 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:00.104 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:00.104 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:05.377 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:05.377 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:05.443 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:05.443 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.6446643007378078
+2025-07-03 20:54:05.443 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.6321510007321355
+2025-07-03 20:54:05.445 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:05.446 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.33990478672926566
+2025-07-03 20:54:05.446 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.34289488847986765
+2025-07-03 20:54:05.446 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.632, AUPRC=0.343
+2025-07-03 20:54:05.446 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 10 dimensions...
+2025-07-03 20:54:05.446 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 10 dimensions
+2025-07-03 20:54:05.503 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 10), Val: (2231, 10), Test: (2195, 10)
+2025-07-03 20:54:05.503 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:05.503 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 10), Y = (2569,)
+2025-07-03 20:54:05.503 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 10), Y = (2231,)
+2025-07-03 20:54:05.503 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 10), Y = (2195,)
+2025-07-03 20:54:05.503 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:05.504 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:05.504 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:05.504 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:10.927 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:10.927 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:11.084 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:11.084 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7072234765470681
+2025-07-03 20:54:11.084 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7027111064066263
+2025-07-03 20:54:11.086 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:11.086 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.40187317670725414
+2025-07-03 20:54:11.087 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.44594136065437984
+2025-07-03 20:54:11.087 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.703, AUPRC=0.446
+2025-07-03 20:54:11.087 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 25 dimensions...
+2025-07-03 20:54:11.087 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 25 dimensions
+2025-07-03 20:54:11.158 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 25), Val: (2231, 25), Test: (2195, 25)
+2025-07-03 20:54:11.159 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:11.159 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 25), Y = (2569,)
+2025-07-03 20:54:11.159 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 25), Y = (2231,)
+2025-07-03 20:54:11.159 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 25), Y = (2195,)
+2025-07-03 20:54:11.159 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:11.159 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:11.160 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:11.160 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:17.487 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:17.488 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:17.875 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:17.876 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7356521422470587
+2025-07-03 20:54:17.876 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7331465505835032
+2025-07-03 20:54:17.878 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:17.878 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.4485613807857861
+2025-07-03 20:54:17.878 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.47876200802530966
+2025-07-03 20:54:17.878 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.733, AUPRC=0.479
+2025-07-03 20:54:17.879 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 50 dimensions...
+2025-07-03 20:54:17.879 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 50 dimensions
+2025-07-03 20:54:17.958 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 50), Val: (2231, 50), Test: (2195, 50)
+2025-07-03 20:54:17.959 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:17.959 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 50), Y = (2569,)
+2025-07-03 20:54:17.959 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 50), Y = (2231,)
+2025-07-03 20:54:17.959 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 50), Y = (2195,)
+2025-07-03 20:54:17.959 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:17.959 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:17.959 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:17.960 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:24.443 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:24.444 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:24.835 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:24.836 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7416072425672977
+2025-07-03 20:54:24.836 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7524654440886678
+2025-07-03 20:54:24.838 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:24.838 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.4641054922052711
+2025-07-03 20:54:24.838 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.4992837809189627
+2025-07-03 20:54:24.839 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.752, AUPRC=0.499
+2025-07-03 20:54:24.839 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 100 dimensions...
+2025-07-03 20:54:24.839 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 100 dimensions
+2025-07-03 20:54:24.941 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 100), Val: (2231, 100), Test: (2195, 100)
+2025-07-03 20:54:24.942 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:24.942 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 100), Y = (2569,)
+2025-07-03 20:54:24.942 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 100), Y = (2231,)
+2025-07-03 20:54:24.942 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 100), Y = (2195,)
+2025-07-03 20:54:24.942 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:24.943 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:24.943 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:24.944 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:31.667 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:31.667 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:32.049 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:32.049 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7425899196422857
+2025-07-03 20:54:32.050 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7527543288611325
+2025-07-03 20:54:32.052 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:32.052 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.4614728478453217
+2025-07-03 20:54:32.052 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.49878032706017716
+2025-07-03 20:54:32.052 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.753, AUPRC=0.499
+2025-07-03 20:54:32.052 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 200 dimensions...
+2025-07-03 20:54:32.052 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 200 dimensions
+2025-07-03 20:54:32.220 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 200), Val: (2231, 200), Test: (2195, 200)
+2025-07-03 20:54:32.221 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:32.221 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 200), Y = (2569,)
+2025-07-03 20:54:32.221 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 200), Y = (2231,)
+2025-07-03 20:54:32.221 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 200), Y = (2195,)
+2025-07-03 20:54:32.221 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:32.221 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:32.222 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:32.223 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:39.384 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:39.386 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:39.787 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:39.787 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7374955583658318
+2025-07-03 20:54:39.787 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7403521306905889
+2025-07-03 20:54:39.789 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:39.789 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.47183932077322455
+2025-07-03 20:54:39.789 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.4863301055345796
+2025-07-03 20:54:39.789 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.740, AUPRC=0.486
+2025-07-03 20:54:39.790 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 400 dimensions...
+2025-07-03 20:54:39.790 | INFO     | reducers:fit_transform:54 - Applying PCA to reduce from 768 to 400 dimensions
+2025-07-03 20:54:40.166 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 400), Val: (2231, 400), Test: (2195, 400)
+2025-07-03 20:54:40.167 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:54:40.167 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 400), Y = (2569,)
+2025-07-03 20:54:40.167 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 400), Y = (2231,)
+2025-07-03 20:54:40.167 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 400), Y = (2195,)
+2025-07-03 20:54:40.167 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:54:40.167 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:54:40.168 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:54:40.169 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:54:48.151 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'cosine', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:54:48.151 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:54:48.564 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:54:48.565 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.7509898499003529
+2025-07-03 20:54:48.565 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.7499928330113701
+2025-07-03 20:54:48.567 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:54:48.567 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.47641730135700033
+2025-07-03 20:54:48.567 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.49169675444063576
+2025-07-03 20:54:48.568 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.750, AUPRC=0.492
+2025-07-03 20:54:48.568 | INFO     | __main__:run_dimensionality_analysis:159 - 
+  Testing method: umap
+2025-07-03 20:54:48.568 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 2 dimensions...
+2025-07-03 20:54:48.568 | INFO     | reducers:fit_transform:89 - Applying UMAP to reduce from 768 to 2 dimensions
+2025-07-03 20:54:48.568 | INFO     | reducers:fit_transform:90 - Using n_neighbors: 15, n_jobs: 190
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+Epochs completed:   0%|            0/500 [00:00]Epochs completed:   0%|            1/500 [00:00]Epochs completed:   4%| ▍          19/500 [00:00]Epochs completed:   7%| ▋          35/500 [00:00]Epochs completed:  10%| █          51/500 [00:00]Epochs completed:  13%| █▎         67/500 [00:01]Epochs completed:  17%| █▋         83/500 [00:01]Epochs completed:  20%| █▉         99/500 [00:01]Epochs completed:  23%| ██▎        115/500 [00:01]Epochs completed:  26%| ██▌        131/500 [00:01]Epochs completed:  29%| ██▉        147/500 [00:01]Epochs completed:  33%| ███▎       163/500 [00:01]Epochs completed:  36%| ███▌       179/500 [00:01]Epochs completed:  39%| ███▉       195/500 [00:01]Epochs completed:  42%| ████▏      211/500 [00:01]Epochs completed:  45%| ████▌      227/500 [00:02]Epochs completed:  49%| ████▊      243/500 [00:02]Epochs completed:  52%| █████▏     259/500 [00:02]Epochs completed:  55%| █████▌     275/500 [00:02]Epochs completed:  58%| █████▊     291/500 [00:02]Epochs completed:  61%| ██████▏    307/500 [00:02]Epochs completed:  65%| ██████▍    323/500 [00:02]Epochs completed:  68%| ██████▊    339/500 [00:02]Epochs completed:  71%| ███████    355/500 [00:02]Epochs completed:  74%| ███████▍   371/500 [00:03]Epochs completed:  77%| ███████▋   387/500 [00:03]Epochs completed:  81%| ████████   403/500 [00:03]Epochs completed:  84%| ████████▍  419/500 [00:03]Epochs completed:  87%| ████████▋  435/500 [00:03]Epochs completed:  90%| █████████  451/500 [00:03]Epochs completed:  93%| █████████▎ 467/500 [00:03]Epochs completed:  97%| █████████▋ 483/500 [00:03]Epochs completed: 100%| █████████▉ 499/500 [00:03]Epochs completed: 100%| ██████████ 500/500 [00:03]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  19%| █▉         19/100 [00:00]Epochs completed:  38%| ███▊       38/100 [00:00]Epochs completed:  56%| █████▌     56/100 [00:00]Epochs completed:  73%| ███████▎   73/100 [00:00]Epochs completed:  90%| █████████  90/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:00]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  19%| █▉         19/100 [00:00]Epochs completed:  38%| ███▊       38/100 [00:00]Epochs completed:  56%| █████▌     56/100 [00:00]Epochs completed:  73%| ███████▎   73/100 [00:00]Epochs completed:  90%| █████████  90/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:00]
+2025-07-03 20:55:21.740 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 2), Val: (2231, 2), Test: (2195, 2)
+2025-07-03 20:55:21.740 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:55:21.740 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 2), Y = (2569,)
+2025-07-03 20:55:21.740 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 2), Y = (2231,)
+2025-07-03 20:55:21.740 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 2), Y = (2195,)
+2025-07-03 20:55:21.741 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:55:21.741 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:55:21.741 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:55:21.741 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:55:26.873 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:55:26.873 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:55:26.899 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:55:26.899 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.6600097329722643
+2025-07-03 20:55:26.899 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.661863681671033
+2025-07-03 20:55:26.901 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:55:26.901 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.33952857387096635
+2025-07-03 20:55:26.902 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.37500704773197413
+2025-07-03 20:55:26.902 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.662, AUPRC=0.375
+2025-07-03 20:55:26.902 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 5 dimensions...
+2025-07-03 20:55:26.902 | INFO     | reducers:fit_transform:89 - Applying UMAP to reduce from 768 to 5 dimensions
+2025-07-03 20:55:26.902 | INFO     | reducers:fit_transform:90 - Using n_neighbors: 15, n_jobs: 190
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+Epochs completed:   0%|            0/500 [00:00]Epochs completed:   3%| ▎          17/500 [00:00]Epochs completed:   7%| ▋          33/500 [00:00]Epochs completed:  10%| ▉          48/500 [00:00]Epochs completed:  12%| █▏         62/500 [00:00]Epochs completed:  15%| █▌         76/500 [00:00]Epochs completed:  18%| █▊         90/500 [00:00]Epochs completed:  21%| ██         104/500 [00:00]Epochs completed:  24%| ██▎        118/500 [00:00]Epochs completed:  26%| ██▋        132/500 [00:00]Epochs completed:  29%| ██▉        146/500 [00:01]Epochs completed:  32%| ███▏       160/500 [00:01]Epochs completed:  35%| ███▍       174/500 [00:01]Epochs completed:  38%| ███▊       188/500 [00:01]Epochs completed:  40%| ████       202/500 [00:01]Epochs completed:  43%| ████▎      216/500 [00:01]Epochs completed:  46%| ████▌      230/500 [00:01]Epochs completed:  49%| ████▉      244/500 [00:01]Epochs completed:  52%| █████▏     258/500 [00:01]Epochs completed:  54%| █████▍     272/500 [00:02]Epochs completed:  57%| █████▋     286/500 [00:02]Epochs completed:  60%| ██████     300/500 [00:02]Epochs completed:  63%| ██████▎    314/500 [00:02]Epochs completed:  66%| ██████▌    328/500 [00:02]Epochs completed:  68%| ██████▊    342/500 [00:02]Epochs completed:  71%| ███████    356/500 [00:02]Epochs completed:  74%| ███████▍   370/500 [00:02]Epochs completed:  77%| ███████▋   384/500 [00:02]Epochs completed:  80%| ███████▉   398/500 [00:02]Epochs completed:  82%| ████████▏  412/500 [00:03]Epochs completed:  85%| ████████▌  426/500 [00:03]Epochs completed:  88%| ████████▊  440/500 [00:03]Epochs completed:  91%| █████████  454/500 [00:03]Epochs completed:  94%| █████████▎ 468/500 [00:03]Epochs completed:  96%| █████████▋ 482/500 [00:03]Epochs completed:  99%| █████████▉ 496/500 [00:03]Epochs completed: 100%| ██████████ 500/500 [00:03]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  17%| █▋         17/100 [00:00]Epochs completed:  34%| ███▍       34/100 [00:00]Epochs completed:  50%| █████      50/100 [00:00]Epochs completed:  66%| ██████▌    66/100 [00:00]Epochs completed:  81%| ████████   81/100 [00:00]Epochs completed:  96%| █████████▌ 96/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:00]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  17%| █▋         17/100 [00:00]Epochs completed:  34%| ███▍       34/100 [00:00]Epochs completed:  50%| █████      50/100 [00:00]Epochs completed:  65%| ██████▌    65/100 [00:00]Epochs completed:  80%| ████████   80/100 [00:00]Epochs completed:  95%| █████████▌ 95/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:00]
+2025-07-03 20:55:45.615 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 5), Val: (2231, 5), Test: (2195, 5)
+2025-07-03 20:55:45.616 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:55:45.616 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 5), Y = (2569,)
+2025-07-03 20:55:45.616 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 5), Y = (2231,)
+2025-07-03 20:55:45.616 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 5), Y = (2195,)
+2025-07-03 20:55:45.616 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:55:45.616 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:55:45.616 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:55:45.617 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:55:50.841 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:55:50.841 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:55:50.879 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:55:50.879 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.684306299506289
+2025-07-03 20:55:50.879 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.6763409987033264
+2025-07-03 20:55:50.881 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:55:50.882 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.3687999656963187
+2025-07-03 20:55:50.882 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.39577172869596944
+2025-07-03 20:55:50.882 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.676, AUPRC=0.396
+2025-07-03 20:55:50.882 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 10 dimensions...
+2025-07-03 20:55:50.882 | INFO     | reducers:fit_transform:89 - Applying UMAP to reduce from 768 to 10 dimensions
+2025-07-03 20:55:50.882 | INFO     | reducers:fit_transform:90 - Using n_neighbors: 15, n_jobs: 190
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+Epochs completed:   0%|            0/500 [00:00]Epochs completed:   3%| ▎          15/500 [00:00]Epochs completed:   6%| ▌          29/500 [00:00]Epochs completed:   8%| ▊          42/500 [00:00]Epochs completed:  11%| █          54/500 [00:00]Epochs completed:  13%| █▎         66/500 [00:00]Epochs completed:  16%| █▌         78/500 [00:00]Epochs completed:  18%| █▊         90/500 [00:00]Epochs completed:  20%| ██         102/500 [00:00]Epochs completed:  23%| ██▎        114/500 [00:00]Epochs completed:  25%| ██▌        126/500 [00:01]Epochs completed:  28%| ██▊        138/500 [00:01]Epochs completed:  30%| ███        150/500 [00:01]Epochs completed:  32%| ███▏       162/500 [00:01]Epochs completed:  35%| ███▍       174/500 [00:01]Epochs completed:  37%| ███▋       186/500 [00:01]Epochs completed:  40%| ███▉       198/500 [00:01]Epochs completed:  42%| ████▏      210/500 [00:01]Epochs completed:  44%| ████▍      222/500 [00:01]Epochs completed:  47%| ████▋      234/500 [00:02]Epochs completed:  49%| ████▉      246/500 [00:02]Epochs completed:  52%| █████▏     258/500 [00:02]Epochs completed:  54%| █████▍     270/500 [00:02]Epochs completed:  56%| █████▋     282/500 [00:02]Epochs completed:  59%| █████▉     294/500 [00:02]Epochs completed:  61%| ██████     306/500 [00:02]Epochs completed:  64%| ██████▎    318/500 [00:02]Epochs completed:  66%| ██████▌    330/500 [00:02]Epochs completed:  68%| ██████▊    342/500 [00:02]Epochs completed:  71%| ███████    354/500 [00:03]Epochs completed:  73%| ███████▎   366/500 [00:03]Epochs completed:  76%| ███████▌   378/500 [00:03]Epochs completed:  78%| ███████▊   390/500 [00:03]Epochs completed:  80%| ████████   402/500 [00:03]Epochs completed:  83%| ████████▎  414/500 [00:03]Epochs completed:  85%| ████████▌  426/500 [00:03]Epochs completed:  88%| ████████▊  438/500 [00:03]Epochs completed:  90%| █████████  450/500 [00:03]Epochs completed:  92%| █████████▏ 462/500 [00:04]Epochs completed:  95%| █████████▍ 474/500 [00:04]Epochs completed:  97%| █████████▋ 486/500 [00:04]Epochs completed: 100%| █████████▉ 498/500 [00:04]Epochs completed: 100%| ██████████ 500/500 [00:04]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  15%| █▌         15/100 [00:00]Epochs completed:  30%| ███        30/100 [00:00]Epochs completed:  44%| ████▍      44/100 [00:00]Epochs completed:  58%| █████▊     58/100 [00:00]Epochs completed:  71%| ███████    71/100 [00:00]Epochs completed:  84%| ████████▍  84/100 [00:00]Epochs completed:  97%| █████████▋ 97/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:00]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  15%| █▌         15/100 [00:00]Epochs completed:  30%| ███        30/100 [00:00]Epochs completed:  44%| ████▍      44/100 [00:00]Epochs completed:  57%| █████▋     57/100 [00:00]Epochs completed:  70%| ███████    70/100 [00:00]Epochs completed:  83%| ████████▎  83/100 [00:00]Epochs completed:  96%| █████████▌ 96/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:00]
+2025-07-03 20:56:10.547 | INFO     | __main__:run_dimensionality_analysis:180 -     Reduced shapes - Train: (2569, 10), Val: (2231, 10), Test: (2195, 10)
+2025-07-03 20:56:10.548 | CRITICAL | eval_module:run_evaluation:76 - Start | Training knn
+2025-07-03 20:56:10.548 | INFO     | eval_module:run_evaluation:77 - Train shape: X = (2569, 10), Y = (2569,)
+2025-07-03 20:56:10.548 | INFO     | eval_module:run_evaluation:78 - Val shape: X = (2231, 10), Y = (2231,)
+2025-07-03 20:56:10.548 | INFO     | eval_module:run_evaluation:79 - Test shape: X = (2195, 10), Y = (2195,)
+2025-07-03 20:56:10.548 | INFO     | eval_module:run_evaluation:80 - Train prevalence:  0.26508369015181005
+2025-07-03 20:56:10.548 | INFO     | eval_module:run_evaluation:81 - Val prevalence:  0.23935454952935903
+2025-07-03 20:56:10.548 | INFO     | eval_module:run_evaluation:82 - Test prevalence:  0.25148063781321184
+2025-07-03 20:56:10.549 | CRITICAL | eval_module:run_evaluation:91 - Start | Fitting knn...
+2025-07-03 20:56:15.844 | INFO     | eval_module:run_evaluation:140 - Best hparams: {'algorithm': 'auto', 'leaf_size': 30, 'metric': 'euclidean', 'metric_params': None, 'n_jobs': None, 'n_neighbors': 5, 'p': 2, 'weights': 'distance'}
+2025-07-03 20:56:15.845 | CRITICAL | eval_module:run_evaluation:143 - Finish | Fitting knn...
+2025-07-03 20:56:15.903 | INFO     | eval_module:run_evaluation:154 - Train AUROC: 1.0
+2025-07-03 20:56:15.904 | INFO     | eval_module:run_evaluation:155 - Val AUROC:   0.6866054659136304
+2025-07-03 20:56:15.904 | INFO     | eval_module:run_evaluation:156 - Test AUROC:  0.6803164721656214
+2025-07-03 20:56:15.906 | INFO     | eval_module:run_evaluation:162 - Train AUPRC: 1.0
+2025-07-03 20:56:15.906 | INFO     | eval_module:run_evaluation:163 - Val AUPRC:   0.3704496942021239
+2025-07-03 20:56:15.906 | INFO     | eval_module:run_evaluation:164 - Test AUPRC:  0.395217696728296
+2025-07-03 20:56:15.906 | INFO     | __main__:run_dimensionality_analysis:199 -     Results: AUROC=0.680, AUPRC=0.395
+2025-07-03 20:56:15.906 | INFO     | __main__:run_dimensionality_analysis:166 -     Reducing to 25 dimensions...
+2025-07-03 20:56:15.907 | INFO     | reducers:fit_transform:89 - Applying UMAP to reduce from 768 to 25 dimensions
+2025-07-03 20:56:15.907 | INFO     | reducers:fit_transform:90 - Using n_neighbors: 15, n_jobs: 190
+/home/pvenema/.conda/envs/EHRSHOT_ENV/lib/python3.10/site-packages/umap/umap_.py:1952: UserWarning: n_jobs value 1 overridden to 1 by setting random_state. Use no seed for parallelism.
+  warn(
+Epochs completed:   0%|            0/500 [00:00]Epochs completed:   2%| ▏          12/500 [00:00]Epochs completed:   5%| ▍          24/500 [00:00]Epochs completed:   7%| ▋          34/500 [00:00]Epochs completed:   9%| ▉          44/500 [00:00]Epochs completed:  11%| █          54/500 [00:00]Epochs completed:  13%| █▎         64/500 [00:00]Epochs completed:  15%| █▍         73/500 [00:00]Epochs completed:  16%| █▋         82/500 [00:00]Epochs completed:  18%| █▊         91/500 [00:01]Epochs completed:  20%| ██         100/500 [00:01]Epochs completed:  22%| ██▏        109/500 [00:01]Epochs completed:  24%| ██▎        118/500 [00:01]Epochs completed:  25%| ██▌        127/500 [00:01]Epochs completed:  27%| ██▋        136/500 [00:01]Epochs completed:  29%| ██▉        145/500 [00:01]Epochs completed:  31%| ███        154/500 [00:01]Epochs completed:  33%| ███▎       163/500 [00:01]Epochs completed:  34%| ███▍       172/500 [00:01]Epochs completed:  36%| ███▌       181/500 [00:02]Epochs completed:  38%| ███▊       190/500 [00:02]Epochs completed:  40%| ███▉       199/500 [00:02]Epochs completed:  42%| ████▏      208/500 [00:02]Epochs completed:  43%| ████▎      217/500 [00:02]Epochs completed:  45%| ████▌      226/500 [00:02]Epochs completed:  47%| ████▋      235/500 [00:02]Epochs completed:  49%| ████▉      244/500 [00:02]Epochs completed:  51%| █████      253/500 [00:02]Epochs completed:  52%| █████▏     262/500 [00:02]Epochs completed:  54%| █████▍     271/500 [00:03]Epochs completed:  56%| █████▌     280/500 [00:03]Epochs completed:  58%| █████▊     289/500 [00:03]Epochs completed:  60%| █████▉     298/500 [00:03]Epochs completed:  61%| ██████▏    307/500 [00:03]Epochs completed:  63%| ██████▎    316/500 [00:03]Epochs completed:  65%| ██████▌    325/500 [00:03]Epochs completed:  67%| ██████▋    334/500 [00:03]Epochs completed:  69%| ██████▊    343/500 [00:03]Epochs completed:  70%| ███████    352/500 [00:03]Epochs completed:  72%| ███████▏   361/500 [00:04]Epochs completed:  74%| ███████▍   370/500 [00:04]Epochs completed:  76%| ███████▌   379/500 [00:04]Epochs completed:  78%| ███████▊   388/500 [00:04]Epochs completed:  79%| ███████▉   397/500 [00:04]Epochs completed:  81%| ████████   406/500 [00:04]Epochs completed:  83%| ████████▎  415/500 [00:04]Epochs completed:  85%| ████████▍  424/500 [00:04]Epochs completed:  87%| ████████▋  433/500 [00:04]Epochs completed:  88%| ████████▊  442/500 [00:05]Epochs completed:  90%| █████████  451/500 [00:05]Epochs completed:  92%| █████████▏ 460/500 [00:05]Epochs completed:  94%| █████████▍ 469/500 [00:05]Epochs completed:  96%| █████████▌ 478/500 [00:05]Epochs completed:  97%| █████████▋ 487/500 [00:05]Epochs completed:  99%| █████████▉ 496/500 [00:05]Epochs completed: 100%| ██████████ 500/500 [00:05]
+Epochs completed:   0%|            0/100 [00:00]Epochs completed:  13%| █▎         13/100 [00:00]Epochs completed:  25%| ██▌        25/100 [00:00]Epochs completed:  36%| ███▌       36/100 [00:00]Epochs completed:  47%| ████▋      47/100 [00:00]Epochs completed:  57%| █████▋     57/100 [00:00]Epochs completed:  67%| ██████▋    67/100 [00:00]Epochs completed:  77%| ███████▋   77/100 [00:00]Epochs completed:  87%| ████████▋  87/100 [00:00]Epochs completed:  97%| █████████▋ 97/100 [00:00]Epochs completed: 100%| ██████████ 100/100 [00:01]
+slurmstepd: error: *** JOB 12957672 ON tcn703 CANCELLED AT 2025-07-03T20:56:34 ***

@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=dim_reduction_all
-#SBATCH --partition=rome
+#SBATCH --job-name=dim_reduction_optimized
+#SBATCH --partition=genoa
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
-#SBATCH --time=48:00:00
+#SBATCH --cpus-per-task=96
+#SBATCH --mem=200G
+#SBATCH --time=24:00:00
 #SBATCH --output=slurm_dimensionality_%j.out
 #SBATCH --error=slurm_dimensionality_%j.err
 #SBATCH --mail-type=END,FAIL
@@ -35,9 +35,24 @@ echo "Available CPUs: $SLURM_CPUS_PER_TASK"
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export OPENBLAS_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export NUMEXPR_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-# Run the dimensionality reduction analysis
-echo "Starting dimensionality reduction analysis..."
+# Set scikit-learn parallel backend
+export SKLEARN_N_JOBS=$SLURM_CPUS_PER_TASK
+
+# Optimize memory allocation
+export MKL_DYNAMIC=FALSE
+export OMP_PROC_BIND=true
+export OMP_PLACES=cores
+
+# Print threading configuration
+echo "Threading configuration:"
+echo "  OMP_NUM_THREADS: $OMP_NUM_THREADS"
+echo "  MKL_NUM_THREADS: $MKL_NUM_THREADS"
+echo "  SKLEARN_N_JOBS: $SKLEARN_N_JOBS"
+
+# Run the dimensionality reduction analysis with optimized threading (skipping baseline)
+echo "Starting optimized dimensionality reduction analysis (skipping baseline)..."
 bash bash_scripts/10_dimensionality_reduction.sh
 
 # Check if the analysis completed successfully

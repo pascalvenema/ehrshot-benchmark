@@ -1,0 +1,185 @@
+Job ID: 12957672
+Job Name: dim_reduction_maximum
+Node: tcn703
+Start Time: Thu Jul  3 20:52:28 CEST 2025
+Working Directory: /gpfs/home6/pvenema/ehrshot-benchmark/ehrshot/bash_scripts
+Python version: Python 3.10.16
+Conda environment: EHRSHOT_ENV
+Available memory:                total        used        free      shared  buff/cache   available
+Mem:           377Gi        20Gi       358Gi       258Mi       3.3Gi       356Gi
+Swap:             0B          0B          0B
+Available CPUs: 190
+Maximum Performance Threading Configuration:
+  CPUs allocated: 190
+  Memory allocated: 327680MB
+  OMP_NUM_THREADS: 190
+  MKL_NUM_THREADS: 190
+  SKLEARN_N_JOBS: 190
+  Node: tcn703
+Initial resource usage:
+               total        used        free      shared  buff/cache   available
+Mem:           377Gi        20Gi       358Gi       258Mi       3.3Gi       356Gi
+Swap:             0B          0B          0B
+top - 20:52:28 up 15 days, 15:50,  0 users,  load average: 0.28, 0.35, 17.25
+Tasks: 1819 total,   1 running, 1818 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.1 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem : 386603.1 total, 366951.1 free,  21241.6 used,   3350.4 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used. 365361.5 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+3202648 pvenema   20   0  237392   4608   3072 R  16.7   0.0   0:00.05 top
+      1 root      20   0  171440   6144   4608 S   0.0   0.0  14:50.38 systemd
+      2 root      20   0       0      0      0 S   0.0   0.0   0:04.41 kthreadd
+      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+
+      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 slub_fl+
+      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 netns
+      8 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+Starting MAXIMUM PERFORMANCE dimensionality reduction analysis...
+🧬 Starting EHRSHOT Dimensionality Reduction Analysis
+==================================================
+Database: ../EHRSHOT_ASSETS/femr/extract
+Labels:   ../EHRSHOT_ASSETS/benchmark
+Features: ../EHRSHOT_ASSETS/features
+Splits:   ../EHRSHOT_ASSETS/splits/person_id_map.csv
+Output:   ../EHRSHOT_ASSETS/dimensionality_analysis
+
+🚀 Running dimensionality reduction analysis...
+UMAP(n_jobs=1, random_state=42, verbose=True)
+Thu Jul  3 20:54:48 2025 Construct fuzzy simplicial set
+Thu Jul  3 20:54:51 2025 Finding Nearest Neighbors
+Thu Jul  3 20:54:58 2025 Finished Nearest Neighbor Search
+Thu Jul  3 20:55:00 2025 Construct embedding
+	completed  0  /  500 epochs
+	completed  50  /  500 epochs
+	completed  100  /  500 epochs
+	completed  150  /  500 epochs
+	completed  200  /  500 epochs
+	completed  250  /  500 epochs
+	completed  300  /  500 epochs
+	completed  350  /  500 epochs
+	completed  400  /  500 epochs
+	completed  450  /  500 epochs
+Thu Jul  3 20:55:04 2025 Finished embedding
+	completed  0  /  100 epochs
+	completed  10  /  100 epochs
+	completed  20  /  100 epochs
+	completed  30  /  100 epochs
+	completed  40  /  100 epochs
+	completed  50  /  100 epochs
+	completed  60  /  100 epochs
+	completed  70  /  100 epochs
+	completed  80  /  100 epochs
+	completed  90  /  100 epochs
+	completed  0  /  100 epochs
+	completed  10  /  100 epochs
+	completed  20  /  100 epochs
+	completed  30  /  100 epochs
+	completed  40  /  100 epochs
+	completed  50  /  100 epochs
+	completed  60  /  100 epochs
+	completed  70  /  100 epochs
+	completed  80  /  100 epochs
+	completed  90  /  100 epochs
+UMAP(n_components=5, n_jobs=1, random_state=42, verbose=True)
+Thu Jul  3 20:55:26 2025 Construct fuzzy simplicial set
+Thu Jul  3 20:55:29 2025 Finding Nearest Neighbors
+Thu Jul  3 20:55:30 2025 Finished Nearest Neighbor Search
+Thu Jul  3 20:55:30 2025 Construct embedding
+	completed  0  /  500 epochs
+	completed  50  /  500 epochs
+	completed  100  /  500 epochs
+	completed  150  /  500 epochs
+	completed  200  /  500 epochs
+	completed  250  /  500 epochs
+	completed  300  /  500 epochs
+	completed  350  /  500 epochs
+	completed  400  /  500 epochs
+	completed  450  /  500 epochs
+Thu Jul  3 20:55:34 2025 Finished embedding
+	completed  0  /  100 epochs
+	completed  10  /  100 epochs
+	completed  20  /  100 epochs
+	completed  30  /  100 epochs
+	completed  40  /  100 epochs
+	completed  50  /  100 epochs
+	completed  60  /  100 epochs
+	completed  70  /  100 epochs
+	completed  80  /  100 epochs
+	completed  90  /  100 epochs
+	completed  0  /  100 epochs
+	completed  10  /  100 epochs
+	completed  20  /  100 epochs
+	completed  30  /  100 epochs
+	completed  40  /  100 epochs
+	completed  50  /  100 epochs
+	completed  60  /  100 epochs
+	completed  70  /  100 epochs
+	completed  80  /  100 epochs
+	completed  90  /  100 epochs
+UMAP(n_components=10, n_jobs=1, random_state=42, verbose=True)
+Thu Jul  3 20:55:50 2025 Construct fuzzy simplicial set
+Thu Jul  3 20:55:53 2025 Finding Nearest Neighbors
+Thu Jul  3 20:55:54 2025 Finished Nearest Neighbor Search
+Thu Jul  3 20:55:54 2025 Construct embedding
+	completed  0  /  500 epochs
+	completed  50  /  500 epochs
+	completed  100  /  500 epochs
+	completed  150  /  500 epochs
+	completed  200  /  500 epochs
+	completed  250  /  500 epochs
+	completed  300  /  500 epochs
+	completed  350  /  500 epochs
+	completed  400  /  500 epochs
+	completed  450  /  500 epochs
+Thu Jul  3 20:55:58 2025 Finished embedding
+	completed  0  /  100 epochs
+	completed  10  /  100 epochs
+	completed  20  /  100 epochs
+	completed  30  /  100 epochs
+	completed  40  /  100 epochs
+	completed  50  /  100 epochs
+	completed  60  /  100 epochs
+	completed  70  /  100 epochs
+	completed  80  /  100 epochs
+	completed  90  /  100 epochs
+	completed  0  /  100 epochs
+	completed  10  /  100 epochs
+	completed  20  /  100 epochs
+	completed  30  /  100 epochs
+	completed  40  /  100 epochs
+	completed  50  /  100 epochs
+	completed  60  /  100 epochs
+	completed  70  /  100 epochs
+	completed  80  /  100 epochs
+	completed  90  /  100 epochs
+UMAP(n_components=25, n_jobs=1, random_state=42, verbose=True)
+Thu Jul  3 20:56:15 2025 Construct fuzzy simplicial set
+Thu Jul  3 20:56:18 2025 Finding Nearest Neighbors
+Thu Jul  3 20:56:19 2025 Finished Nearest Neighbor Search
+Thu Jul  3 20:56:19 2025 Construct embedding
+	completed  0  /  500 epochs
+	completed  50  /  500 epochs
+	completed  100  /  500 epochs
+	completed  150  /  500 epochs
+	completed  200  /  500 epochs
+	completed  250  /  500 epochs
+	completed  300  /  500 epochs
+	completed  350  /  500 epochs
+	completed  400  /  500 epochs
+	completed  450  /  500 epochs
+Thu Jul  3 20:56:25 2025 Finished embedding
+
+JOB STATISTICS
+==============
+Job ID: 12957672
+Cluster: snellius
+User/Group: pvenema/pvenema
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 192
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 13:45:36 core-walltime
+Job Wall-clock time: 00:04:18
+Memory Utilized: 10.25 GB
+Memory Efficiency: 3.20% of 320.00 GB (320.00 GB/node)

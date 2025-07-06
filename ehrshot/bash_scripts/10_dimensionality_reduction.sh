@@ -63,7 +63,8 @@ python analysis/dimensionality_reduction.py \
     --tasks guo_los guo_readmission guo_icu lab_thrombocytopenia lab_hyperkalemia lab_hypoglycemia lab_hyponatremia lab_anemia new_hypertension new_hyperlipidemia new_pancan new_celiac new_lupus new_acutemi \
     --models clmbr clinicalbert_type3_clinicalbert_pool \
     --dimensions 2 5 10 25 50 100 200 400 \
-    --methods pca umap tsne
+    --methods pca umap \
+    --skip_baseline
 
 echo ""
 echo "✅ Dimensionality reduction analysis completed!"

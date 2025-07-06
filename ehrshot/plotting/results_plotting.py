@@ -745,7 +745,7 @@ def plot_embedding_comparison_lr_only(df_results: pd.DataFrame,
     
     # Define colors and styles
     clmbr_style = {'color': 'blue', 'linestyle': '-', 'marker': 's', 'label': 'CLMBR + LR'}
-    cb_style = {'color': 'lightcoral', 'linestyle': '-', 'marker': '^', 'label': 'ClinicalBERT Type 3 (Custom Pooling) + LR'}
+    cb_style = {'color': 'lightcoral', 'linestyle': '-', 'marker': '^', 'label': 'ClinicalBERT + LR'}
     
     for idx, task_group in enumerate(task_groups):
         ax = axes[idx] if n_groups > 1 else axes

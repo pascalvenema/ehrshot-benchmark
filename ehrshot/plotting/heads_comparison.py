@@ -68,7 +68,7 @@ def plot_all_heads_comparison(df_results: pd.DataFrame,
     # Models to plot
     models = [
         ('clmbr', 'CLMBR'),
-        ('clinicalbert_type3_clinicalbert_pool', 'ClinicalBERT Type 3')
+        ('clinicalbert_type3_clinicalbert_pool', 'ClinicalBERT')
     ]
     
     for model_idx, (model_name, model_label) in enumerate(models):
