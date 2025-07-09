@@ -74,7 +74,7 @@ def create_clean_dimensionality_plots(results_df: pd.DataFrame,
         fig, ax = plt.subplots(1, 1, figsize=(12, 8))
         
         models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
-        model_labels = ['CLMBR', 'ClinicalBERT Type3']
+        model_labels = ['CLMBR', 'ClinicalBERT']
         methods = ['pca', 'umap']  # Exclude t-SNE for clean plots
         
         # Define colors for each model-method combination
@@ -138,10 +138,9 @@ def create_clean_dimensionality_plots(results_df: pd.DataFrame,
                               label=f'{model_label} 768D Baseline ({baseline_mean:.3f})')
         
         # Customize plot
-        ax.set_xlabel('Reduced Dimensions', fontsize=14)
-        ax.set_ylabel(f'{metric.upper()} Score', fontsize=14)
-        ax.set_title(f'Dimensionality Reduction Performance - {metric.upper()}', 
-                    fontsize=16, fontweight='bold')
+        ax.set_xlabel('# of Dimensions', fontsize=14)
+        ax.set_ylabel(f'{metric.upper()}', fontsize=14)
+        # Title removed per user request
         ax.set_xscale('log')
         ax.set_xticks(dimensions)
         ax.set_xticklabels([str(d) for d in dimensions])
@@ -227,7 +226,7 @@ def create_per_task_dimensionality_plots(results_df: pd.DataFrame,
                     # Determine if task is still being processed or has no data
                     status = "Processing..." if task not in available_tasks else "No Data"
                     ax.set_title(f'{task}\n{model_label} - {status}')
-                    ax.set_xlabel('Reduced Dimensions')
+                    ax.set_xlabel('# of Dimensions')
                     ax.set_ylabel(f'{metric.upper()}')
                     ax.text(0.5, 0.5, status, transform=ax.transAxes, 
                            ha='center', va='center', fontsize=12, alpha=0.6)
@@ -264,7 +263,7 @@ def create_per_task_dimensionality_plots(results_df: pd.DataFrame,
                               linewidth=1.5, alpha=0.7, label='768D Baseline')
                 
                 # Customize subplot
-                ax.set_xlabel('Reduced Dimensions', fontsize=10)
+                ax.set_xlabel('# of Dimensions', fontsize=10)
                 ax.set_ylabel(f'{metric.upper()}', fontsize=10)
                 ax.set_title(f'{task}\n{model_label}', fontsize=11, fontweight='bold')
                 ax.set_xscale('log')
@@ -277,8 +276,7 @@ def create_per_task_dimensionality_plots(results_df: pd.DataFrame,
                 if task_idx == 0 and model_idx == 0:
                     ax.legend(fontsize=9)
         
-        plt.suptitle(f'Per-Task Dimensionality Reduction Performance - {metric.upper()}', 
-                    fontsize=16, fontweight='bold')
+        # Main title removed per user request
         plt.tight_layout()
         
         # Save the per-task plot
