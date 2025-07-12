@@ -1,12 +1,4 @@
-"""
-Plotting module for EHRSHOT benchmark visualization.
 
-This module contains all plotting functionality including:
-- Base plotting utilities
-- Results visualization
-- Cohort analysis plots
-- Comparison plots between different models
-"""
 
 from .base_plotting import (
     plot_one_labeling_function,

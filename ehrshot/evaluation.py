@@ -1,7 +1,4 @@
-"""Create a file at `PATH_TO_LABELS_AND_FEATS_DIR/LABELING_FUNCTION/{SHOT_STRAT}_results.csv` containing:
-    Output is a CSV with headers:
-        sub_task, model, head, replicate, score_name, score_value, k
-"""
+
 
 import argparse
 import json

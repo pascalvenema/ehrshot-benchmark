@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""
-Standalone Dimensionality Reduction Plotting Module
-
-This module generates clean dimensionality plots independently from the analysis pipeline.
-It reads pre-computed dimensionality reduction results and creates publication-ready visualizations.
-"""
-
 import os
 import argparse
 import pandas as pd
@@ -14,299 +7,223 @@ import numpy as np
 from typing import Dict, List, Optional
 
 try:
-    from ..utils import LABELING_FUNCTION_2_PAPER_NAME
+    from ..utils import (
+        LABELING_FUNCTION_2_PAPER_NAME,
+        TASK_GROUP_2_LABELING_FUNCTION,
+        TASK_GROUP_2_PAPER_NAME,
+    )
 except ImportError:
-    # Fallback for direct execution
     import sys
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-    from utils import LABELING_FUNCTION_2_PAPER_NAME
 
-def load_baseline_results(results_dir: str, tasks: List[str], models: List[str]) -> Dict[str, Dict[str, Dict[str, float]]]:
-    """
-    Load baseline kNN results from existing CSV files.
-    
-    Returns:
-        Dict[task][model][metric] = score
-    """
+    sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+    from utils import (
+        LABELING_FUNCTION_2_PAPER_NAME,
+        TASK_GROUP_2_LABELING_FUNCTION,
+        TASK_GROUP_2_PAPER_NAME,
+    )
+
+
+def load_baseline_results(
+    results_dir: str, tasks: List[str], models: List[str]
+) -> Dict[str, Dict[str, Dict[str, float]]]:
     baseline_results = {}
-    
+
     for task in tasks:
         csv_path = os.path.join(results_dir, f"{task}/all_results.csv")
-        if not os.path.exists(csv_path):
-            print(f"Warning: No baseline results file found for {task}")
-            continue
-            
+
         df = pd.read_csv(csv_path)
-        
-        # Filter for kNN results with full data (k=-1)
+
+        # filter for kNN results with full data (k=-1)
         knn_baseline = df[
-            (df['head'] == 'knn') & 
-            (df['k'] == -1) &
-            (df['replicate'] == 0)  # Use first replicate
+            (df["head"] == "knn")
+            & (df["k"] == -1)
+            & (df["replicate"] == 0)  # not applicable for full data
         ]
-        
+
         task_results = {}
-        
+
         for model in models:
-            model_data = knn_baseline[knn_baseline['model'] == model]
+            model_data = knn_baseline[knn_baseline["model"] == model]
             if not model_data.empty:
                 task_results[model] = {}
                 for _, row in model_data.iterrows():
-                    task_results[model][row['score']] = row['value']
-        
+                    task_results[model][row["score"]] = row["value"]
+
         baseline_results[task] = task_results
-    
+
     return baseline_results
 
-def create_clean_dimensionality_plots(results_df: pd.DataFrame, 
-                                    baseline_results: Dict, 
-                                    output_dir: str,
-                                    include_baseline: bool = True) -> None:
-    """Create clean dimensionality plots with all models and methods on the same plot."""
-    os.makedirs(output_dir, exist_ok=True)
-    
-    print("Creating clean dimensionality plots...")
-    
-    # Create separate plots for AUROC and AUPRC
-    for metric in ['auroc', 'auprc']:
-        
-        # Create single figure for this metric - all lines on same plot
-        fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-        
-        models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
-        model_labels = ['CLMBR', 'ClinicalBERT']
-        methods = ['pca', 'umap']  # Exclude t-SNE for clean plots
-        
-        # Define colors for each model-method combination
-        colors = {
-            ('clmbr', 'pca'): '#2E86AB',      # Blue for CLMBR PCA
-            ('clmbr', 'umap'): '#A23B72',     # Purple for CLMBR UMAP
-            ('clinicalbert_type3_clinicalbert_pool', 'pca'): '#F18F01',   # Orange for ClinicalBERT PCA
-            ('clinicalbert_type3_clinicalbert_pool', 'umap'): '#C73E1D'   # Red for ClinicalBERT UMAP
-        }
-        
-        # Get all dimensions across both models
-        all_dimensions = set()
-        for model in models:
-            model_data = results_df[
-                (results_df['model'] == model) &
-                (results_df['metric'] == metric)
-            ]
-            if not model_data.empty:
-                all_dimensions.update(model_data['dimension'].unique())
-        
-        dimensions = sorted(list(all_dimensions))
-        
-        # Plot each model-method combination
-        for model, model_label in zip(models, model_labels):
-            for method in methods:
-                # Filter data for this model, method, and metric
-                method_data = results_df[
-                    (results_df['model'] == model) &
-                    (results_df['method'] == method) &
-                    (results_df['metric'] == metric)
-                ]
-                
-                if not method_data.empty:
-                    # Calculate mean performance across tasks for each dimension
-                    grouped = method_data.groupby('dimension')['score'].agg(['mean', 'std']).reset_index()
-                    
-                    color = colors.get((model, method), 'gray')
-                    label = f'{model_label} {method.upper()}'
-                    
-                    ax.errorbar(grouped['dimension'], grouped['mean'], yerr=grouped['std'],
-                               color=color, marker='o', linewidth=3, markersize=8,
-                               label=label, capsize=5, capthick=2, alpha=0.9)
-        
-        # Add baselines if available and requested
-        if include_baseline and baseline_results:
-            for model, model_label in zip(models, model_labels):
-                all_baseline_scores = []
-                
-                # Get baseline scores for this model across all tasks
-                for task in results_df[results_df['model'] == model]['task'].unique():
-                    if (task in baseline_results and 
-                        model in baseline_results[task] and 
-                        metric in baseline_results[task][model]):
-                        all_baseline_scores.append(baseline_results[task][model][metric])
-                
-                if all_baseline_scores:
-                    baseline_mean = np.mean(all_baseline_scores)
-                    baseline_color = '#2E86AB' if model == 'clmbr' else '#F18F01'  # Match model colors
-                    ax.axhline(y=baseline_mean, color=baseline_color, linestyle='--', 
-                              linewidth=2, alpha=0.7, 
-                              label=f'{model_label} 768D Baseline ({baseline_mean:.3f})')
-        
-        # Customize plot
-        ax.set_xlabel('# of Dimensions', fontsize=14)
-        ax.set_ylabel(f'{metric.upper()}', fontsize=14)
-        # Title removed per user request
-        ax.set_xscale('log')
-        ax.set_xticks(dimensions)
-        ax.set_xticklabels([str(d) for d in dimensions])
-        ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=11, loc='best')
-        
-        # Make the plot look more polished
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_linewidth(0.5)
-        ax.spines['bottom'].set_linewidth(0.5)
-        
-        plt.tight_layout()
-        
-        # Save with the specific filename
-        output_file = os.path.join(output_dir, f"clean_{metric}_vs_dimensions_separated.png")
-        plt.savefig(output_file, dpi=300, bbox_inches='tight')
-        plt.close()
-        
-        print(f"✅ Saved: clean_{metric}_vs_dimensions_separated.png")
 
-def create_per_task_dimensionality_plots(results_df: pd.DataFrame, 
-                                        baseline_results: Dict, 
-                                        output_dir: str) -> None:
-    """Create dimensionality plots showing performance for each individual task."""
+def create_category_based_dimensionality_plots(
+    results_df: pd.DataFrame,
+    baseline_results: Dict,
+    output_dir: str,
+    include_baseline: bool = True,
+) -> None:
     os.makedirs(output_dir, exist_ok=True)
-    
-    print("Creating per-task dimensionality plots...")
-    
-    # Use all 14 expected tasks, regardless of whether results are available yet
-    tasks = [
-        # Operational outcomes
-        'guo_los', 'guo_readmission', 'guo_icu',
-        # Lab values  
-        'lab_thrombocytopenia', 'lab_hyperkalemia', 'lab_hypoglycemia', 'lab_hyponatremia', 'lab_anemia',
-        # New diagnoses
-        'new_hypertension', 'new_hyperlipidemia', 'new_pancan', 'new_celiac', 'new_lupus', 'new_acutemi'
-    ]
-    
-    models = ['clmbr', 'clinicalbert_type3_clinicalbert_pool']
-    model_labels = ['CLMBR', 'ClinicalBERT Type3']
-    methods = ['pca', 'umap']
-    method_colors = {'pca': '#1f77b4', 'umap': '#ff7f0e'}
-    
-    # Get available tasks from data for reference
-    available_tasks = set(results_df['task'].unique()) if not results_df.empty else set()
-    print(f"Including all 14 tasks in grid. Available results for: {len(available_tasks)} tasks")
-    
-    # Create separate plots for AUROC and AUPRC
-    for metric in ['auroc', 'auprc']:
-        # Calculate subplot grid size - we want tasks in rows, models in columns
-        n_tasks = len(tasks)
-        n_models = len(models)
-        
-        # Create figure with subplots for each task-model combination
-        fig, axes = plt.subplots(n_tasks, n_models, figsize=(8 * n_models, 4 * n_tasks))
-        
-        # Handle single task case
-        if n_tasks == 1:
-            axes = axes.reshape(1, -1)
-        if n_models == 1:
-            axes = axes.reshape(-1, 1)
-        
-        for task_idx, task in enumerate(tasks):
-            for model_idx, (model, model_label) in enumerate(zip(models, model_labels)):
-                if n_tasks == 1 and n_models == 1:
-                    ax = axes
-                elif n_tasks == 1:
-                    ax = axes[model_idx]
-                elif n_models == 1:
-                    ax = axes[task_idx]
-                else:
-                    ax = axes[task_idx, model_idx]
-                
-                # Filter data for this task, model and metric
-                task_model_data = results_df[
-                    (results_df['task'] == task) &
-                    (results_df['model'] == model) &
-                    (results_df['metric'] == metric)
-                ]
-                
-                if task_model_data.empty:
-                    # Determine if task is still being processed or has no data
-                    status = "Processing..." if task not in available_tasks else "No Data"
-                    ax.set_title(f'{task}\n{model_label} - {status}')
-                    ax.set_xlabel('# of Dimensions')
-                    ax.set_ylabel(f'{metric.upper()}')
-                    ax.text(0.5, 0.5, status, transform=ax.transAxes, 
-                           ha='center', va='center', fontsize=12, alpha=0.6)
-                    continue
-                
-                # Get dimensions tested for this task/model
-                dimensions = sorted(task_model_data['dimension'].unique())
-                
-                # Plot each reduction method
+
+    # get task categories
+    task_groups = list(TASK_GROUP_2_LABELING_FUNCTION.keys())
+    n_groups = len(task_groups)
+
+    models = ["clmbr", "clinicalbert_type3_clinicalbert_pool"]
+    model_labels = ["CLMBR", "ClinicalBERT"]
+    methods = ["pca", "umap"]
+
+    # define colors for each model-method combination
+    colors = {
+        ("clmbr", "pca"): "#1f77b4",
+        ("clmbr", "umap"): "#9467bd",
+        ("clinicalbert_type3_clinicalbert_pool", "pca"): "#ff7f0e",
+        ("clinicalbert_type3_clinicalbert_pool", "umap"): "#d62728",
+    }
+
+    # create separate plots for AUROC and AUPRC
+    for metric in ["auroc", "auprc"]:
+
+        # create figure with 3 subplots (one for each category)
+        fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+        for idx, task_group in enumerate(task_groups):
+            ax = axes[idx]
+            labeling_functions = TASK_GROUP_2_LABELING_FUNCTION[task_group]
+
+            # filter data for this task category
+            category_data = results_df[
+                (results_df["task"].isin(labeling_functions))
+                & (results_df["metric"] == metric)
+            ]
+
+            if category_data.empty:
+                ax.set_title(
+                    f"{TASK_GROUP_2_PAPER_NAME[task_group]}\n(No data available)"
+                )
+                ax.set_xlabel("# of Dimensions")
+                ax.set_ylabel(f"{metric.upper()}")
+                continue
+
+            # get all dimensions for this category
+            all_dimensions = set(category_data["dimension"].unique())
+            dimensions = sorted(list(all_dimensions))
+
+            # Plot each model-method combination
+            for model, model_label in zip(models, model_labels):
                 for method in methods:
-                    method_data = task_model_data[task_model_data['method'] == method]
-                    
+                    # filter data for this model, method, and metric
+                    method_data = category_data[
+                        (category_data["model"] == model)
+                        & (category_data["method"] == method)
+                    ]
+
                     if not method_data.empty:
-                        # Get scores for each dimension
-                        scores = []
-                        for dim in dimensions:
-                            dim_data = method_data[method_data['dimension'] == dim]
-                            if not dim_data.empty:
-                                scores.append(dim_data['score'].iloc[0])
-                            else:
-                                scores.append(np.nan)
-                        
-                        # Plot the line
-                        ax.plot(dimensions, scores, 
-                               color=method_colors[method], label=method.upper(), 
-                               linewidth=2, marker='o', markersize=6)
-                
-                # Add baseline if available
-                if (baseline_results and task in baseline_results and 
-                    model in baseline_results[task] and 
-                    metric in baseline_results[task][model]):
-                    baseline_score = baseline_results[task][model][metric]
-                    ax.axhline(y=baseline_score, color='black', linestyle='--', 
-                              linewidth=1.5, alpha=0.7, label='768D Baseline')
-                
-                # Customize subplot
-                ax.set_xlabel('# of Dimensions', fontsize=10)
-                ax.set_ylabel(f'{metric.upper()}', fontsize=10)
-                ax.set_title(f'{task}\n{model_label}', fontsize=11, fontweight='bold')
-                ax.set_xscale('log')
-                if dimensions:
-                    ax.set_xticks(dimensions)
-                    ax.set_xticklabels([str(d) for d in dimensions], fontsize=8)
-                ax.grid(True, alpha=0.3)
-                
-                # Only show legend on first subplot to avoid clutter
-                if task_idx == 0 and model_idx == 0:
-                    ax.legend(fontsize=9)
-        
-        # Main title removed per user request
+                        # calculate mean performance across tasks in this category for each dimension
+                        grouped = (
+                            method_data.groupby("dimension")["score"]
+                            .agg(["mean", "std"])
+                            .reset_index()
+                        )
+
+                        color = colors.get((model, method), "gray")
+                        label = f"{model_label} {method.upper()}"
+
+                        ax.errorbar(
+                            grouped["dimension"],
+                            grouped["mean"],
+                            yerr=grouped["std"],
+                            color=color,
+                            marker="o",
+                            linewidth=3,
+                            markersize=8,
+                            label=label,
+                            alpha=0.9,
+                        )
+
+            # aadd baselines if available and requested
+            if include_baseline and baseline_results:
+                for model, model_label in zip(models, model_labels):
+                    all_baseline_scores = []
+
+                    # get baseline scores for this model across all tasks in this category
+                    for task in labeling_functions:
+                        if (
+                            task in baseline_results
+                            and model in baseline_results[task]
+                            and metric in baseline_results[task][model]
+                        ):
+                            all_baseline_scores.append(
+                                baseline_results[task][model][metric]
+                            )
+
+                    if all_baseline_scores:
+                        baseline_mean = np.mean(all_baseline_scores)
+                        baseline_color = "#1f77b4" if model == "clmbr" else "#ff7f0e"
+                        ax.axhline(
+                            y=baseline_mean,
+                            color=baseline_color,
+                            linestyle="--",
+                            linewidth=2,
+                            alpha=0.7,
+                            label=f"{model_label} 768D Baseline",
+                        )
+
+            # customize subplot
+            ax.set_xlabel("# of Dimensions", fontsize=12)
+            ax.set_ylabel(f"{metric.upper()}", fontsize=12)
+            ax.set_title(
+                f"{TASK_GROUP_2_PAPER_NAME[task_group]}", fontsize=14, fontweight="bold"
+            )
+            ax.set_xscale("log")
+            if dimensions:
+                ax.set_xticks(dimensions)
+                ax.set_xticklabels([str(d) for d in dimensions])
+            ax.grid(True, alpha=0.3)
+
+            # Show legend on middle subplot to indicate it applies to all figures
+            if idx == 1:
+                legend = ax.legend(
+                    fontsize=10,
+                    loc="upper center",
+                    bbox_to_anchor=(0.5, 0.95),
+                    ncol=2,
+                    frameon=True,
+                    fancybox=True,
+                    shadow=True,
+                )
+
+            # make the plot look more polished
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+            ax.spines["left"].set_linewidth(0.5)
+            ax.spines["bottom"].set_linewidth(0.5)
+
         plt.tight_layout()
-        
-        # Save the per-task plot
-        output_file = os.path.join(output_dir, f"clean_{metric}_vs_dimensions_per_task.png")
-        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+
+        # save with the specific filename
+        output_file = os.path.join(
+            output_dir, f"clean_{metric}_vs_dimensions_by_category.png"
+        )
+        plt.savefig(output_file, dpi=300, bbox_inches="tight")
         plt.close()
-        
-        print(f"✅ Saved: clean_{metric}_vs_dimensions_per_task.png")
+
+        print(f"saved: clean_{metric}_vs_dimensions_by_category.png")
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate clean dimensionality reduction plots")
-    parser.add_argument("--results_csv", required=True, 
-                       help="Path to dimensionality results CSV file")
-    parser.add_argument("--output_dir", required=True, 
-                       help="Directory to save plots")
-    parser.add_argument("--baseline_dir", 
-                       help="Directory containing baseline results (optional)")
-    parser.add_argument("--no_baseline", action="store_true",
-                       help="Skip baseline comparison lines")
-    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--results_csv", required=True)
+    parser.add_argument("--output_dir", required=True)
+    parser.add_argument("--baseline_dir")
+    parser.add_argument("--no_baseline", action="store_true")
+
     args = parser.parse_args()
-    
-    # Load results
-    print(f"Loading results from {args.results_csv}")
+
+    # load results
     results_df = pd.read_csv(args.results_csv)
-    
+
     # Get unique tasks and models from the data
-    tasks = results_df['task'].unique().tolist()
-    models = results_df['model'].unique().tolist()
-    
+    tasks = results_df["task"].unique().tolist()
+    models = results_df["model"].unique().tolist()
+
     # Load baseline results if provided
     baseline_results = {}
     include_baseline = not args.no_baseline
@@ -315,14 +232,13 @@ def main():
         baseline_results = load_baseline_results(args.baseline_dir, tasks, models)
     else:
         include_baseline = False
-    
-    # Create clean separated plots (the main ones requested)
-    create_clean_dimensionality_plots(results_df, baseline_results, args.output_dir, include_baseline)
-    
-    # Create per-task plots (new functionality)
-    create_per_task_dimensionality_plots(results_df, baseline_results, args.output_dir)
-    
-    print("✅ Dimensionality plotting completed successfully!")
+
+    create_category_based_dimensionality_plots(
+        results_df, baseline_results, args.output_dir, include_baseline
+    )
+
+    print("dimensionality plotting completed successfully!")
+
 
 if __name__ == "__main__":
-    main() 
+    main()
